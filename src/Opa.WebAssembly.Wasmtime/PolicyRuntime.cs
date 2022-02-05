@@ -2,24 +2,26 @@ using Wasmtime;
 
 namespace Opa.WebAssembly.Wasmtime;
 
+using System.Diagnostics.CodeAnalysis;
 using Exceptions;
 
-internal class Runtime : IDisposable
+internal class PolicyRuntime : Disposable
 {
-    private bool disposedValue;
-
-    public Runtime(Engine engine)
+    public PolicyRuntime(Engine engine)
     {
         Store = new Store(engine);
         Linker = new Linker(engine);
         Memory = new Memory(Store, 2);
+
+        LinkGlobalImports();
     }
 
     public Store Store { get; }
 
     public Linker Linker { get; }
 
-    public Memory Memory { get; }
+    [NotNull]
+    public Memory? Memory { get; private set; }
 
     private void LinkGlobalImports()
     {
@@ -35,23 +37,14 @@ internal class Runtime : IDisposable
 
     private void Define(string name, object item) => Linker.Define(WellKnown.Imports.Namespace, name, item);
 
-    protected virtual void Dispose(bool disposing)
+    protected override void DisposeManaged()
     {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                Store.Dispose();
-                Linker.Dispose();
-            }
-
-            disposedValue = true;
-        }
+        Store.Dispose();
+        Linker.Dispose();
     }
 
-    public void Dispose()
+    protected override void DisposeUnmanaged()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        Memory = null;
     }
 }

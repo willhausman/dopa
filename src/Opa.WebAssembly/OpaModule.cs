@@ -1,8 +1,7 @@
 ﻿namespace Opa.WebAssembly;
 
-public class OpaModule : IOpaModule
+public class OpaModule : Disposable, IOpaModule
 {
-    private bool disposedValue;
     private readonly IWasmModule module;
 
     public OpaModule(IWasmModule module)
@@ -15,22 +14,8 @@ public class OpaModule : IOpaModule
         throw new NotImplementedException();
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected override void DisposeManaged()
     {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                this.module.Dispose();
-            }
-
-            disposedValue = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        this.module.Dispose();
     }
 }

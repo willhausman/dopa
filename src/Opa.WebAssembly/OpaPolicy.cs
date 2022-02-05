@@ -2,10 +2,8 @@ namespace Opa.WebAssembly;
 
 using Serialization;
 
-public class OpaPolicy : IOpaPolicy
+public class OpaPolicy : Disposable, IOpaPolicy
 {
-    private bool disposedValue;
-
     private readonly IWasmInstance instance;
     private readonly IOpaSerializer serializer;
 
@@ -25,22 +23,8 @@ public class OpaPolicy : IOpaPolicy
         throw new NotImplementedException();
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected override void DisposeManaged()
     {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                this.instance.Dispose();
-            }
-
-            disposedValue = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        this.instance.Dispose();
     }
 }

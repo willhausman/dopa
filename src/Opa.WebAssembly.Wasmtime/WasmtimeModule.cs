@@ -2,9 +2,8 @@ using Wasmtime;
 
 namespace Opa.WebAssembly.Wasmtime;
 
-public class WasmtimeModule : IWasmModule
+public class WasmtimeModule : Disposable, IWasmModule
 {
-    private bool disposedValue;
     private readonly Engine engine;
     private readonly Module module;
 
@@ -16,7 +15,8 @@ public class WasmtimeModule : IWasmModule
 
     public IWasmInstance CreateInstance()
     {
-        throw new NotImplementedException();
+        var runtime = new PolicyRuntime(engine);
+        return new WasmtimeInstance(runtime, module);
     }
 
       public static WasmtimeModule FromFile(string filePath)
@@ -25,23 +25,9 @@ public class WasmtimeModule : IWasmModule
           return new WasmtimeModule(engine, Module.FromFile(engine, filePath));
       }
 
-    protected virtual void Dispose(bool disposing)
+    protected override void DisposeManaged()
     {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                engine.Dispose();
-                module.Dispose();
-            }
-
-            disposedValue = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        module.Dispose();
+        engine.Dispose();
     }
 }

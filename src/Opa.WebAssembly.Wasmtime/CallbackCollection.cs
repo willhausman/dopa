@@ -1,16 +1,22 @@
+using System.Collections.Concurrent;
+using Opa.WebAssembly.Extensions;
 using Wasmtime;
 
 namespace Opa.WebAssembly.Wasmtime;
 
-internal class BuiltinCollection
+internal class CallbackCollection
 {
-    private Runtime runtime;
+    private IDictionary<int, string> builtins = new Dictionary<int, string>();
+    private readonly ConcurrentDictionary<string, Callback> callbacks = new();
+    private PolicyRuntime runtime;
     private IStore Store => runtime.Store;
     private Linker Linker => runtime.Linker;
 
-	  public BuiltinCollection(Runtime runtime)
+    public CallbackCollection(PolicyRuntime runtime, IEnumerable<Callback> callbacks)
     {
         this.runtime = runtime;
+        this.callbacks = callbacks.ToConcurrentDictionary(c => c.Name);
+
         LinkBuiltins();
     }
 

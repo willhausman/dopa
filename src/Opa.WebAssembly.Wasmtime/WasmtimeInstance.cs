@@ -1,32 +1,37 @@
+using System.Diagnostics.CodeAnalysis;
+using Wasmtime;
+
 namespace Opa.WebAssembly.Wasmtime;
 
-internal class WasmtimeInstance : IWasmInstance
+internal sealed class WasmtimeInstance : Disposable, IWasmInstance
 {
-    private readonly Runtime runtime;
+    [NotNull]
+    private Instance? instance;
+    private readonly CallbackCollection callbacks;
+    private readonly PolicyRuntime runtime;
+    private Store store => runtime.Store;
+    private Linker linker => runtime.Linker;
 
-    public WasmtimeInstance(Runtime runtime)
+    public WasmtimeInstance(PolicyRuntime runtime, Module module)
     {
         this.runtime = runtime;
+        this.callbacks = new CallbackCollection(runtime, new Callback[0]);
+
+        this.instance = linker.Instantiate(store, module);
     }
 
-    private bool disposedValue;
-
-    protected virtual void Dispose(bool disposing)
+    ~WasmtimeInstance()
     {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                this.runtime.Dispose();
-            }
-
-            disposedValue = true;
-        }
+        Dispose(false);
     }
 
-    public void Dispose()
+    protected override void DisposeManaged()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
+        this.runtime.Dispose();
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        this.instance = null;
     }
 }
