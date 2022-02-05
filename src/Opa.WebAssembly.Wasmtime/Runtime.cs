@@ -2,6 +2,8 @@ using Wasmtime;
 
 namespace Opa.WebAssembly.Wasmtime;
 
+using Exceptions;
+
 internal class Runtime : IDisposable
 {
     private bool disposedValue;

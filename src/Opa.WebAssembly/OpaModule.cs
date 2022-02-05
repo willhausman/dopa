@@ -1,4 +1,4 @@
-﻿namespace Opa.WebAssembly.Wasmtime;
+﻿namespace Opa.WebAssembly;
 
 public class OpaModule : IOpaModule
 {

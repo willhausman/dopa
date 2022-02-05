@@ -1,6 +1,7 @@
-using Opa.WebAssembly.Serialization;
+namespace Opa.WebAssembly;
 
-namespace Opa.WebAssembly.Wasmtime;
+using Serialization;
+
 public class OpaPolicy : IOpaPolicy
 {
     private bool disposedValue;

@@ -1,4 +1,5 @@
-namespace Opa.WebAssembly;
+namespace Opa.WebAssembly.Exceptions;
+
 public class OpaAbortException : Exception
 {
     private OpaAbortException(string message) 
