@@ -17,30 +17,15 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
     [NotNull]
     private Memory? memory;
 
-    public OpaRuntime(Engine engine, Module module)
+    public OpaRuntime(Store store, Memory memory, Linker linker, Module module)
     {
-        store = new Store(engine);
-        memory = new Memory(store);
-
-        using var linker = new Linker(engine);
-
-        Link(linker);
+        this.store = store;
+        this.memory = memory;
 
         instance = linker.Instantiate(store, module);
-        Builtins = new BuiltinCollection(GetBuiltins());
     }
 
-    public BuiltinCollection Builtins { get; }
-
-    public string ReadJson(int address)
-    {
-        var jsonAddress = Invoke<int>(WellKnown.Export.opa_json_dump, address);
-        var result = memory.ReadNullTerminatedString(store, jsonAddress);
-
-        ReleaseMemory(address, jsonAddress);
-
-        return result;
-    }
+    public string ReadJson(int address) => ReadJson(address, true);
 
     public int WriteJson(string json)
     {
@@ -54,8 +39,39 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         return resultAddress != 0 ? resultAddress : throw new ArgumentException("OPA failed to parse the input json.", nameof(json));
     }
 
-    private string ReadJson(string function) =>
-        ReadJson(Invoke<int>(function));
+    public IDictionary<int, string> GetBuiltins()
+    {
+        var json = ReadJson(WellKnown.Export.builtins, releaseFunction: false);
+        var builtins = JsonSerializer.Deserialize<IDictionary<int, string>>(json, OpaSerializerOptions.Default);
+
+        return builtins is not null ? builtins : new Dictionary<int, string>();
+    }
+
+    public IDictionary<string, int> GetEntrypoints()
+    {
+        var json = ReadJson(WellKnown.Export.entrypoints, releaseFunction: false);
+        var entrypoints = JsonSerializer.Deserialize<IDictionary<string, int>>(json, OpaSerializerOptions.Default);
+
+        return entrypoints is not null ? entrypoints : new Dictionary<string, int>();
+    }
+
+    private string ReadJson(string function, bool releaseFunction = true) =>
+        ReadJson(Invoke<int>(function), releaseFunction);
+    
+    private string ReadJson(int address, bool releaseAddress = true)
+    {
+        var jsonAddress = Invoke<int>(WellKnown.Export.opa_json_dump, address);
+        var result = memory.ReadNullTerminatedString(store, jsonAddress);
+
+        ReleaseMemory(jsonAddress);
+
+        if (releaseAddress)
+        {
+            ReleaseMemory(address);
+        }
+
+        return result;
+    }
 
     private void ReleaseMemory(params int[] addresses) =>
         addresses.ForEach(a => Invoke(WellKnown.Export.opa_free, a));
@@ -88,44 +104,6 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
 
         throw new InvalidOperationException($"Could not invoke '{function}'");
     }
-
-    private IDictionary<int, string> GetBuiltins()
-    {
-        var json = ReadJson(WellKnown.Export.builtins);
-        var builtins = JsonSerializer.Deserialize<IDictionary<int, string>>(json, OpaSerializerOptions.Default);
-
-        return builtins is not null ? builtins : new Dictionary<int, string>();
-    }
-
-    private void Link(Linker linker)
-    {
-        LinkGlobalImports(linker);
-        LinkBuiltins(linker);
-    }
-
-    private void LinkGlobalImports(Linker linker)
-    {
-        Define(linker, WellKnown.Imports.memory, memory);
-
-        Define(
-            linker,
-            WellKnown.Imports.opa_abort,
-            Function.FromCallback(
-                store,
-                (Caller caller, int address) =>
-                    throw OpaAbortException.Because(memory.ReadNullTerminatedString(store, address))));
-    }
-
-    private void LinkBuiltins(Linker linker)
-    {
-        Define(linker, WellKnown.Imports.opa_builtin0, Function.FromCallback(store, (Caller caller, int builtinId, int _) => Builtins[builtinId].Invoke()));
-        Define(linker, WellKnown.Imports.opa_builtin1, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1) => Builtins[builtinId].Invoke(address1)));
-        Define(linker, WellKnown.Imports.opa_builtin2, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2) => Builtins[builtinId].Invoke(address1, address2)));
-        Define(linker, WellKnown.Imports.opa_builtin3, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3) => Builtins[builtinId].Invoke(address1, address2, address3)));
-        Define(linker, WellKnown.Imports.opa_builtin4, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3, int address4) => Builtins[builtinId].Invoke(address1, address2, address3, address4)));
-    }
-
-    private void Define(Linker linker, string name, object item) => linker.Define(WellKnown.Imports.Namespace, name, item);
 
     ~OpaRuntime()
     {

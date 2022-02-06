@@ -13,7 +13,16 @@ public class WasmModule : Disposable, IWasmModule
         this.module = module;
     }
 
-    public IOpaRuntime CreateRuntime() => new OpaRuntime(engine, module);
+    public IOpaRuntime CreateRuntime(IBuiltinCollection collection)
+    {
+        using var linker = new Linker(engine);
+        var store = new Store(engine);
+        var memory = new Memory(store);
+        
+        linker.LinkForOpa(store, memory, collection);
+
+        return new OpaRuntime(store, memory, linker, module);
+    }
 
     public static IOpaModule FromFile(string filePath)
     {

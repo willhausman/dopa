@@ -31,4 +31,15 @@ public static class EnumerableExtensions
             await callback(item);
         }
     }
+
+    /// <summary>
+    /// Does not handle duplicate values.
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    public static IDictionary<TValue, TKey> ToReverseDictionary<TKey, TValue>(this IDictionary<TKey, TValue> dict)
+        where TValue : notnull =>
+        dict.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
 }
