@@ -7,10 +7,9 @@ using Wasmtime;
 
 namespace Opa.WebAssembly.Wasmtime;
 
-internal sealed class Runtime : Disposable, IOpaRuntime
+internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {
     private readonly Store store;
-    private readonly Linker linker;
 
     [NotNull]
     private Instance? instance;
@@ -18,16 +17,16 @@ internal sealed class Runtime : Disposable, IOpaRuntime
     [NotNull]
     private Memory? memory;
 
-    public Runtime(Engine engine, Module module)
+    public OpaRuntime(Engine engine, Module module)
     {
         store = new Store(engine);
-        linker = new Linker(engine);
         memory = new Memory(store);
 
-        Link();
+        using var linker = new Linker(engine);
+
+        Link(linker);
 
         instance = linker.Instantiate(store, module);
-
         Builtins = new BuiltinCollection(GetBuiltins());
     }
 
@@ -74,7 +73,7 @@ internal sealed class Runtime : Disposable, IOpaRuntime
         }
         else
         {
-            throw new InvalidOperationException($"Could not invoke '{function}'");
+            throw new InvalidOperationException($"Could not invoke '{function}' builtin.");
         }
     }
 
@@ -98,17 +97,18 @@ internal sealed class Runtime : Disposable, IOpaRuntime
         return builtins is not null ? builtins : new Dictionary<int, string>();
     }
 
-    private void Link()
+    private void Link(Linker linker)
     {
-        LinkGlobalImports();
-        LinkBuiltins();
+        LinkGlobalImports(linker);
+        LinkBuiltins(linker);
     }
 
-    private void LinkGlobalImports()
+    private void LinkGlobalImports(Linker linker)
     {
-        Define(WellKnown.Imports.memory, memory);
+        Define(linker, WellKnown.Imports.memory, memory);
 
         Define(
+            linker,
             WellKnown.Imports.opa_abort,
             Function.FromCallback(
                 store,
@@ -116,18 +116,18 @@ internal sealed class Runtime : Disposable, IOpaRuntime
                     throw OpaAbortException.Because(memory.ReadNullTerminatedString(store, address))));
     }
 
-    private void LinkBuiltins()
+    private void LinkBuiltins(Linker linker)
     {
-        Define(WellKnown.Imports.opa_builtin0, Function.FromCallback(store, (Caller caller, int builtinId, int _) => Builtins[builtinId].Invoke()));
-        Define(WellKnown.Imports.opa_builtin1, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1) => Builtins[builtinId].Invoke(address1)));
-        Define(WellKnown.Imports.opa_builtin2, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2) => Builtins[builtinId].Invoke(address1, address2)));
-        Define(WellKnown.Imports.opa_builtin3, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3) => Builtins[builtinId].Invoke(address1, address2, address3)));
-        Define(WellKnown.Imports.opa_builtin4, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3, int address4) => Builtins[builtinId].Invoke(address1, address2, address3, address4)));
+        Define(linker, WellKnown.Imports.opa_builtin0, Function.FromCallback(store, (Caller caller, int builtinId, int _) => Builtins[builtinId].Invoke()));
+        Define(linker, WellKnown.Imports.opa_builtin1, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1) => Builtins[builtinId].Invoke(address1)));
+        Define(linker, WellKnown.Imports.opa_builtin2, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2) => Builtins[builtinId].Invoke(address1, address2)));
+        Define(linker, WellKnown.Imports.opa_builtin3, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3) => Builtins[builtinId].Invoke(address1, address2, address3)));
+        Define(linker, WellKnown.Imports.opa_builtin4, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3, int address4) => Builtins[builtinId].Invoke(address1, address2, address3, address4)));
     }
 
-    private void Define(string name, object item) => linker.Define(WellKnown.Imports.Namespace, name, item);
+    private void Define(Linker linker, string name, object item) => linker.Define(WellKnown.Imports.Namespace, name, item);
 
-    ~Runtime()
+    ~OpaRuntime()
     {
         Dispose(false);
     }
@@ -135,7 +135,6 @@ internal sealed class Runtime : Disposable, IOpaRuntime
     protected override void DisposeManaged()
     {
         this.store.Dispose();
-        this.linker.Dispose();
     }
 
     protected override void DisposeUnmanaged()

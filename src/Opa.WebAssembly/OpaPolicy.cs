@@ -13,7 +13,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.serializer = serializer;
     }
 
-    public T? Evaluate<T>(object input)
+    public T Evaluate<T>(object input)
     {
         throw new NotImplementedException();
     }

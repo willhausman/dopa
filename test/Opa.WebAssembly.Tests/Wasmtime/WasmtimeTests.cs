@@ -46,7 +46,30 @@ public class WasmtimeTests
         result.Should().Be(expected);
     }
 
-    
+    [Fact]
+    public void InstanceRunsAfterLinkerDisposed()
+    {
+        var expected = 1;
+        using var engine = new Engine();
+        using var module = Module.FromText(engine, "hello", SampleWat);
+        using var store = new Store(engine);
+
+        Instance instance;
+
+        using (var linker = new Linker(engine))
+        {
+            linker.Define(
+                "",
+                "hello",
+                Function.FromCallback(store, () => expected)
+            );
+
+            instance = linker.Instantiate(store, module);
+        }
+
+        var result = instance.GetFunction(store, "run")?.Invoke(store);
+        result.Should().Be(expected);
+    }
 
     private const string SampleWat = @"(module
   (import """" ""hello"" (func $.hello (result i32)))

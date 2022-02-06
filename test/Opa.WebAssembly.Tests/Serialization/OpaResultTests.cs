@@ -18,7 +18,6 @@ public class OpaResultTests
 
         DeserializeResult<string>(camelJson, pascalOptions).Should().Be("value");
         DeserializeResult<string>(camelJson, camelOptions).Should().Be("value");
-        
     }
 
     private T? DeserializeResult<T>(string json, JsonSerializerOptions options)
