@@ -13,17 +13,14 @@ public class WasmtimeModule : Disposable, IWasmModule
         this.module = module;
     }
 
-    public IWasmInstance CreateInstance()
-    {
-        var runtime = new PolicyRuntime(engine);
-        return new WasmtimeInstance(runtime, module);
-    }
+    public IOpaRuntime CreateRuntime() => new Runtime(engine, module);
 
-      public static WasmtimeModule FromFile(string filePath)
-      {
-          var engine = new Engine();
-          return new WasmtimeModule(engine, Module.FromFile(engine, filePath));
-      }
+    public static IOpaModule FromFile(string filePath)
+    {
+        var engine = new Engine();
+        var module = new WasmtimeModule(engine, Module.FromFile(engine, filePath));
+        return new OpaModule(module);
+    }
 
     protected override void DisposeManaged()
     {

@@ -1,8 +1,11 @@
-﻿namespace Opa.WebAssembly;
+﻿using Opa.WebAssembly.Serialization;
+
+namespace Opa.WebAssembly;
 
 public class OpaModule : Disposable, IOpaModule
 {
     private readonly IWasmModule module;
+    private readonly IOpaSerializer serializer = new DefaultSerializer();
 
     public OpaModule(IWasmModule module)
     {
@@ -11,7 +14,8 @@ public class OpaModule : Disposable, IOpaModule
 
     public IOpaPolicy CreatePolicy()
     {
-        throw new NotImplementedException();
+        var runtime = module.CreateRuntime();
+        return new OpaPolicy(runtime, serializer);
     }
 
     protected override void DisposeManaged()

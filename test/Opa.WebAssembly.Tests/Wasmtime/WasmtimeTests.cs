@@ -6,7 +6,7 @@ using Xunit;
 namespace Opa.WebAssembly.Tests.Wasmtime;
 
 /// <summary>
-/// Collection of tests used to verify the approach taken for the Wasmtime implementation of <see cref="IWasmInstance" />
+/// Collection of tests used to verify the approach taken for the Wasmtime implementation of <see cref="IOpaRuntime" />
 /// </summary>
 public class WasmtimeTests
 {

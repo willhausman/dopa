@@ -4,10 +4,11 @@ namespace Opa.WebAssembly.Serialization;
 
 public class DefaultSerializer : IOpaSerializer
 {
-    private readonly JsonSerializerOptions? options;
+    private readonly JsonSerializerOptions options;
 
     public DefaultSerializer()
     {
+        this.options = OpaSerializerOptions.Default;
     }
 
     public DefaultSerializer(JsonSerializerOptions options)

@@ -4,12 +4,12 @@ using Serialization;
 
 public class OpaPolicy : Disposable, IOpaPolicy
 {
-    private readonly IWasmInstance instance;
+    private readonly IOpaRuntime runtime;
     private readonly IOpaSerializer serializer;
 
-    public OpaPolicy(IWasmInstance instance, IOpaSerializer serializer)
+    public OpaPolicy(IOpaRuntime runtime, IOpaSerializer serializer)
     {
-        this.instance = instance;
+        this.runtime = runtime;
         this.serializer = serializer;
     }
 
@@ -23,8 +23,38 @@ public class OpaPolicy : Disposable, IOpaPolicy
         throw new NotImplementedException();
     }
 
+    public void AddBuiltin<TResult>(string name, Func<TResult> callback)
+    {
+        var builtin = new Builtin<TResult>(name, runtime, serializer, callback);
+        runtime.Builtins.AddBuiltin(builtin);
+    }
+
+    public void AddBuiltin<TArg, TResult>(string name, Func<TArg, TResult> callback)
+    {
+        var builtin = new Builtin<TArg, TResult>(name, runtime, serializer, callback);
+        runtime.Builtins.AddBuiltin(builtin);
+    }
+
+    public void AddBuiltin<TArg1, TArg2, TResult>(string name, Func<TArg1, TArg2, TResult> callback)
+    {
+        var builtin = new Builtin<TArg1, TArg2, TResult>(name, runtime, serializer, callback);
+        runtime.Builtins.AddBuiltin(builtin);
+    }
+
+    public void AddBuiltin<TArg1, TArg2, TArg3, TResult>(string name, Func<TArg1, TArg2, TArg3, TResult> callback)
+    {
+        var builtin = new Builtin<TArg1, TArg2, TArg3, TResult>(name, runtime, serializer, callback);
+        runtime.Builtins.AddBuiltin(builtin);
+    }
+
+    public void AddBuiltin<TArg1, TArg2, TArg3, TArg4, TResult>(string name, Func<TArg1, TArg2, TArg3, TArg4, TResult> callback)
+    {
+        var builtin = new Builtin<TArg1, TArg2, TArg3, TArg4, TResult>(name, runtime, serializer, callback);
+        runtime.Builtins.AddBuiltin(builtin);
+    }
+
     protected override void DisposeManaged()
     {
-        this.instance.Dispose();
+        this.runtime.Dispose();
     }
 }
