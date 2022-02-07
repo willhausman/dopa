@@ -1,33 +1,46 @@
-using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using Xunit;
 
 namespace CShopa.Tests.OpaPolicyTests;
 
-[Collection(nameof(WasmtimePolicyCollection))]
-public class EvaluateShould
+public class EvaluateShould : OpaPolicyTestBase
 {
-    private readonly WasmtimePolicyFixture fixture;
-
-    public EvaluateShould(WasmtimePolicyFixture fixture)
+    public EvaluateShould(RuntimeFixture fixture)
+        : base(fixture)
     {
-        this.fixture = fixture;
     }
 
-    [Fact]
-    public void ReturnSimpleEvaluateWithData()
+    [Theory]
+    [InlineData(Runtime.Wasmtime)]
+    public void ReturnSimpleEvaluateWithData(Runtime runtime)
     {
-        // Given
-        var policy = fixture.ExampleModule.CreatePolicy();
+        var policy = ExamplePolicy(runtime);
         policy.SetData(new { world = "hello" });
-    
-        // When
-        var result = policy.Evaluate<IEnumerable<OpaResult<bool>>>(new { message = "hello" });
-    
-        // Then
-        result?.FirstOrDefault()?.Result.Should().BeTrue();
+
+        var result = policy.Evaluate<bool>(new { message = "hello" });
+
+        result.Should().BeTrue();
     }
 
-    private record OpaResult<T>(T Result);
+    [Theory]
+    [InlineData(Runtime.Wasmtime)]
+    public void HonorDefaultResponse(Runtime runtime)
+    {
+        var policy = ExamplePolicy(runtime);
+        var result = policy.Evaluate<bool>(new { message = "hello" });
+        result.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData(Runtime.Wasmtime)]
+    public void ReturnJson(Runtime runtime)
+    {
+        var policy = ExamplePolicy(runtime);
+        policy.SetData(new { world = "hello" });
+
+        var result = policy.Evaluate<bool>(new { message = "hello" }, out var json);
+
+        result.Should().BeTrue();
+        json.Should().Be(@"[{""result"":true}]");
+    }
 }

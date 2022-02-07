@@ -22,11 +22,13 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.builtins.BuiltinMap = GetBuiltins();
     }
 
-    public T? Evaluate<T>(object input)
-    {
-        var responseJson = EvaluateJson(serializer.Serialize(input));
+    public T? Evaluate<T>(object input) => Evaluate<T>(input, out var _);
 
-        return serializer.Deserialize<T>(responseJson);
+    public T? Evaluate<T>(object input, out string responseJson)
+    {
+        responseJson = EvaluateJson(serializer.Serialize(input));
+        var response = serializer.Deserialize<IEnumerable<IDictionary<string, T>>>(responseJson)?.Select(d => d["result"]);
+        return response is not null ? response.FirstOrDefault() : default;
     }
 
     public string EvaluateJson(string json)
