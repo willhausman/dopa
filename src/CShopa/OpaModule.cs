@@ -17,10 +17,11 @@ public class OpaModule : Disposable, IOpaModule
         var collection = new BuiltinCollection();
         var runtime = module.CreateRuntime(collection);
 
-        collection.BuiltinMap = runtime.GetBuiltins();
+        var policy = new OpaPolicy(runtime, serializer, collection);
+
         // this.builtins.ForEach(b => collection.AddBuiltin(b));
 
-        return new OpaPolicy(runtime, serializer, collection);
+        return policy;
     }
 
     protected override void DisposeManaged()

@@ -86,4 +86,9 @@ public static class WellKnown
         /// <summary>Invalid object path reference.</summary>
         OPA_ERR_INVALID_PATh = 3,
     }
+
+    public static class Requirements
+    {
+        public const int MinimumMemorySize = 2;
+    }
 }

@@ -59,6 +59,7 @@ public class Builtin<TArg, TResult> : Builtin
 
     public override int Invoke(params int[] argAddresses)
     {
+        ValidateParamsLength(argAddresses, 1);
         var result = callback(GetArg<TArg>(argAddresses[0])!);
         return Return(result);
     }
@@ -76,6 +77,7 @@ public class Builtin<TArg1, TArg2, TResult> : Builtin
 
     public override int Invoke(params int[] argAddresses)
     {
+        ValidateParamsLength(argAddresses, 2);
         var result = callback(
             GetArg<TArg1>(argAddresses[0])!,
             GetArg<TArg2>(argAddresses[1])!);
@@ -95,6 +97,7 @@ public class Builtin<TArg1, TArg2, TArg3, TResult> : Builtin
 
     public override int Invoke(params int[] argAddresses)
     {
+        ValidateParamsLength(argAddresses, 3);
         var result = callback(
             GetArg<TArg1>(argAddresses[0])!,
             GetArg<TArg2>(argAddresses[1])!,
@@ -115,6 +118,7 @@ public class Builtin<TArg1, TArg2, TArg3, TArg4, TResult> : Builtin
 
     public override int Invoke(params int[] argAddresses)
     {
+        ValidateParamsLength(argAddresses, 4);
         var result = callback(
             GetArg<TArg1>(argAddresses[0])!,
             GetArg<TArg2>(argAddresses[1])!,

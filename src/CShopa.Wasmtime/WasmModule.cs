@@ -17,7 +17,7 @@ public class WasmModule : Disposable, IWasmModule
     {
         using var linker = new Linker(engine);
         var store = new Store(engine);
-        var memory = new Memory(store, 2);
+        var memory = new Memory(store, WellKnown.Requirements.MinimumMemorySize);
         
         linker.LinkForOpa(store, memory, collection);
 
