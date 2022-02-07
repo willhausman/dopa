@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Opa.WebAssembly.Exceptions;
 using Opa.WebAssembly.Extensions;
 using Opa.WebAssembly.Serialization;
 using Wasmtime;
@@ -10,6 +9,11 @@ namespace Opa.WebAssembly.Wasmtime;
 internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {
     private readonly Store store;
+
+    // memory is structured to re-evaluate from heap pointer following this general structure: | data | input data | <- evaluation starts after input data
+    private int initialHeapPointer;
+    private int dataAddress;
+    private int inputAddress;
 
     [NotNull]
     private Instance? instance;
@@ -23,6 +27,31 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         this.memory = memory;
 
         instance = linker.Instantiate(store, module);
+		inputAddress = dataAddress = initialHeapPointer = Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
+    }
+
+    public string EvaluateJson(string json)
+    {
+        var opaReservedParam = 0;
+        var jsonFormat = 0;
+        var entrypoint = 0;
+        memory.WriteString(store, inputAddress, json); // always reset input json
+
+        var address = Invoke<int>(
+            WellKnown.Export.opa_eval,
+            opaReservedParam,
+            entrypoint,
+            dataAddress, // address of stored data
+            inputAddress, // where we wrote the input json to. This is actually the current execution heap pointer. We're offsetting it
+            json.Length, // length of input json to offset the current execution heap pointer
+            inputAddress + json.Length, // new heap pointer to start execution
+            jsonFormat);
+
+        var result = memory.ReadNullTerminatedString(store, address);
+
+        ReleaseMemory(address);
+
+        return result;
     }
 
     public string ReadJson(int address) => ReadJson(address, true);
@@ -53,6 +82,13 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         var entrypoints = JsonSerializer.Deserialize<IDictionary<string, int>>(json, OpaSerializerOptions.Default);
 
         return entrypoints is not null ? entrypoints : new Dictionary<string, int>();
+    }
+
+    public void SetDataJson(string json)
+    {
+        Invoke(WellKnown.Export.opa_heap_ptr_set, initialHeapPointer); // rewind time and start over
+        dataAddress = WriteJson(json);
+        inputAddress = Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
     }
 
     private string ReadJson(string function, bool releaseFunction = true) =>

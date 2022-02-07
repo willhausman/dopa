@@ -16,14 +16,18 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.builtins = builtins;
     }
 
-    public T Evaluate<T>(object input)
+    public T? Evaluate<T>(object input)
     {
-        throw new NotImplementedException();
+        var responseJson = runtime.EvaluateJson(serializer.Serialize(input));
+
+        return serializer.Deserialize<T>(responseJson);
     }
+
+    public string EvaluateJson(string input) => runtime.EvaluateJson(input);
 
     public void SetData<T>(T input)
     {
-        throw new NotImplementedException();
+        runtime.SetDataJson(serializer.Serialize(input));
     }
 
     public bool AddBuiltin<TResult>(string name, Func<TResult> callback) =>
