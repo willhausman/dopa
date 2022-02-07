@@ -27,4 +27,13 @@
     <ProjectReference Include="..\..\src\Opa.WebAssembly.Wasmtime\Opa.WebAssembly.Wasmtime.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="policies\example.rego">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="policies\example.wasm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

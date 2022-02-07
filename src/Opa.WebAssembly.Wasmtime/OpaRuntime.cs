@@ -61,7 +61,7 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         var address = ReserveMemory(json.Length);
         memory.WriteString(store, address, json);
 
-        var resultAddress = Invoke<int>(WellKnown.Export.opa_json_parse, json.Length);
+        var resultAddress = Invoke<int>(WellKnown.Export.opa_json_parse, address, json.Length);
 
         ReleaseMemory(address);
         
