@@ -3,7 +3,7 @@ using Wasmtime;
 
 namespace CShopa.Wasmtime;
 
-internal sealed class OpaRuntime : OpaRuntimeBase
+internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {
     private readonly Store store;
 
@@ -21,13 +21,13 @@ internal sealed class OpaRuntime : OpaRuntimeBase
         instance = linker.Instantiate(store, module);
     }
 
-    public override string ReadValueAt(int address) =>
+    public string ReadValueAt(int address) =>
         memory.ReadNullTerminatedString(store, address);
 
-    public override void WriteValueAt(int address, string json) =>
+    public void WriteValueAt(int address, string json) =>
         memory.WriteString(store, address, json);
 
-    public override void Invoke(string function, params object[] rest)
+    public void Invoke(string function, params object[] rest)
     {
         var run = instance.GetFunction(store, function);
 
@@ -41,8 +41,7 @@ internal sealed class OpaRuntime : OpaRuntimeBase
         }
     }
 
-    [return: MaybeNull] // the abstract class declares T? return type, but the override forces T..?
-    public override T Invoke<T>(string function, params object[] rest)
+    public T? Invoke<T>(string function, params object[] rest)
     {
         var run = instance.GetFunction(store, function);
 

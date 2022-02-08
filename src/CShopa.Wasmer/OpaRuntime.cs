@@ -3,7 +3,7 @@ using WasmerSharp;
 
 namespace CShopa.Wasmer;
 
-internal sealed class OpaRuntime : OpaRuntimeBase
+internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {
     private Memory memory;
     private Instance instance;
@@ -14,19 +14,18 @@ internal sealed class OpaRuntime : OpaRuntimeBase
         this.instance = instance;
     }
 
-    public override string ReadValueAt(int address) =>
+    public string ReadValueAt(int address) =>
         memory.ReadNullTerminatedString(address);
     
-    public override void WriteValueAt(int address, string json) =>
+    public void WriteValueAt(int address, string json) =>
         memory.WriteString(address, json);
 
-    public override void Invoke(string function, params object[] rest)
+    public void Invoke(string function, params object[] rest)
     {
         var _ = instance.Call(function, rest) ?? throw new InvalidOperationException($"Could not invoke '{function}'.");
     }
 
-    [return: MaybeNull]
-    public override T Invoke<T>(string function, params object[] rest)
+    public T? Invoke<T>(string function, params object[] rest)
     {
         var result = instance.Call(function, rest) ?? throw new InvalidOperationException($"Could not invoke '{function}'.");
         return (T?)result[0];
