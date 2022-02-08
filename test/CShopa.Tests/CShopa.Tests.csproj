@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\CShopa\CShopa.csproj" />
     <ProjectReference Include="..\..\src\CShopa.Wasmtime\CShopa.Wasmtime.csproj" />
+    <ProjectReference Include="..\..\src\CShopa.Wasmer\CShopa.Wasmer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

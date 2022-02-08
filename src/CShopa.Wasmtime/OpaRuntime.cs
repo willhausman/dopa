@@ -1,10 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using CShopa.Extensions;
 using Wasmtime;
 
 namespace CShopa.Wasmtime;
 
-internal sealed class OpaRuntime : Disposable, IOpaRuntime
+internal sealed class OpaRuntime : OpaRuntimeBase
 {
     private readonly Store store;
 
@@ -22,48 +21,13 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         instance = linker.Instantiate(store, module);
     }
 
-    public int WriteJson(string json)
-    {
-        var address = ReserveMemory(json.Length);
-        WriteValueAt(address, json);
-
-        var resultAddress = Invoke<int>(WellKnown.Export.opa_json_parse, address, json.Length);
-
-        ReleaseMemory(address);
-
-        return resultAddress != 0 ? resultAddress : throw new ArgumentException("OPA failed to parse the input json.", nameof(json));
-    }
-
-    public string ReadValueAt(int address) =>
+    public override string ReadValueAt(int address) =>
         memory.ReadNullTerminatedString(store, address);
-    
-    public string ReadJson(int address, bool releaseAddress = true)
-    {
-        var jsonAddress = Invoke<int>(WellKnown.Export.opa_json_dump, address);
-        var result = ReadValueAt(jsonAddress);
 
-        ReleaseMemory(jsonAddress);
-
-        if (releaseAddress)
-        {
-            ReleaseMemory(address);
-        }
-
-        return result;
-    }
-
-    public void ReleaseMemory(params int[] addresses) =>
-        addresses.ForEach(a => Invoke(WellKnown.Export.opa_free, a));
-
-    public int ReserveMemory(int length) =>
-        Invoke<int>(WellKnown.Export.opa_malloc, length);
-    
-    public void WriteValueAt(int address, string json)
-    {
+    public override void WriteValueAt(int address, string json) =>
         memory.WriteString(store, address, json);
-    }
 
-    public void Invoke(string function, params object[] rest)
+    public override void Invoke(string function, params object[] rest)
     {
         var run = instance.GetFunction(store, function);
 
@@ -73,11 +37,12 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         }
         else
         {
-            throw new InvalidOperationException($"Could not invoke '{function}' builtin.");
+            throw new InvalidOperationException($"Could not invoke '{function}'.");
         }
     }
 
-    public T? Invoke<T>(string function, params object[] rest)
+    [return: MaybeNull] // the abstract class declares T? return type, but the override forces T..?
+    public override T Invoke<T>(string function, params object[] rest)
     {
         var run = instance.GetFunction(store, function);
 

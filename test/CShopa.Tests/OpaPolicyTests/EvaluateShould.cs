@@ -12,6 +12,7 @@ public class EvaluateShould : OpaPolicyTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
+    [InlineData(Runtime.Wasmer)]
     public void ReturnSimpleEvaluateWithData(Runtime runtime)
     {
         var policy = ExamplePolicy(runtime);
@@ -24,6 +25,7 @@ public class EvaluateShould : OpaPolicyTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
+    [InlineData(Runtime.Wasmer)]
     public void HonorDefaultResponse(Runtime runtime)
     {
         var policy = ExamplePolicy(runtime);
@@ -33,6 +35,7 @@ public class EvaluateShould : OpaPolicyTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
+    [InlineData(Runtime.Wasmer)]
     public void ReturnJson(Runtime runtime)
     {
         var policy = ExamplePolicy(runtime);
