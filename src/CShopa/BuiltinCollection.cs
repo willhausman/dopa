@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using CShopa.Extensions;
 
 namespace CShopa;
 
@@ -18,11 +17,11 @@ public class BuiltinCollection : IBuiltinCollection
         this.builtinIds = builtinMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
     }
 
-    public IDictionary<int, string> BuiltinMap
+    public IDictionary<string, int> BuiltinMap
     {
         get
         {
-            return this.builtinIds.ToReverseDictionary();
+            return this.builtinIds;
         }
         set
         {
@@ -31,7 +30,7 @@ public class BuiltinCollection : IBuiltinCollection
                 throw new InvalidOperationException("Builtin collection cannot be reinitialized.");
             }
 
-            this.builtinIds = value.ToReverseDictionary();
+            this.builtinIds = value;
         }
     }
 

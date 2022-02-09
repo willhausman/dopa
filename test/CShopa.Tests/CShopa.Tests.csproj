@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="policies\example.rego">
+    <None Update="policies\builtins.wasm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="policies\example.wasm">

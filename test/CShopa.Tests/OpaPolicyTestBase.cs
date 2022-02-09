@@ -13,4 +13,6 @@ public abstract class OpaPolicyTestBase
     }
 
     protected IOpaPolicy ExamplePolicy(Runtime runtime) => fixture.ExampleModule(runtime).CreatePolicy();
+
+    protected IOpaPolicy BuiltinsPolicy(Runtime runtime) => fixture.BuiltinsModule(runtime).CreatePolicy();
 }

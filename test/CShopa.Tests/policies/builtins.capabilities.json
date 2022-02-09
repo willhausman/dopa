@@ -1,0 +1,134 @@
+{
+    "builtins": [
+      {
+        "name": "custom.builtin0",
+        "decl": {
+          "args": [
+          ],
+          "result": {
+            "type": "any"
+          },
+          "type": "function"
+        }
+      },
+      {
+        "name": "custom.builtin1",
+        "decl": {
+          "args": [
+            {
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "any"
+          },
+          "type": "function"
+        }
+      },	
+      {
+        "name": "custom.builtin2",
+        "decl": {
+          "args": [
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "any"
+          },
+          "type": "function"
+        }
+      },	
+      {
+        "name": "custom.builtin3",
+        "decl": {
+          "args": [
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "any"
+          },
+          "type": "function"
+        }
+      },	
+      {
+        "name": "custom.builtin4",
+        "decl": {
+          "args": [
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "any"
+          },
+          "type": "function"
+        }
+      },
+      {
+        "name": "type_name",
+        "decl": {
+          "args": [
+            {
+              "of": [
+                {
+                  "type": "any"
+                }
+              ],
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "string"
+          },
+          "type": "function"
+        }
+      },
+      {
+        "name": "eq",
+        "decl": {
+          "args": [
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "boolean"
+          },
+          "type": "function"
+        },
+        "infix": "="
+      }
+    ],
+    "future_keywords": [
+    ],
+    "wasm_abi_versions": [
+        {
+            "version": 1,
+            "minor_version": 2
+        }
+    ]
+}

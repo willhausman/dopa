@@ -2,7 +2,7 @@ namespace CShopa;
 
 public interface IBuiltinCollection
 {
-    IDictionary<int, string> BuiltinMap { get; set; }
+    IDictionary<string, int> BuiltinMap { get; set; }
 
     bool AddBuiltin(Builtin callback);
 

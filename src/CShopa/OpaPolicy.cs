@@ -10,6 +10,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
     private readonly IBuiltinCollection builtins;
 
     // memory is structured to re-evaluate from heap pointer following this general structure: | data | input data | <- evaluation starts after input data
+    // the pointers and addresses returned from the OPA assembly are int32.
     private int initialHeapPointer;
     private int dataAddress;
     private int inputAddress;
@@ -52,8 +53,6 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
         var result = runtime.ReadValueAt(address);
 
-        runtime.ReleaseMemory(address);
-
         return result;
     }
 
@@ -87,22 +86,22 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.runtime.Dispose();
     }
 
-    private IDictionary<int, string> GetBuiltins()
+    private IDictionary<string, int> GetBuiltins()
     {
-        var json = ReadJson(WellKnown.Export.builtins, releaseFunction: false);
-        var builtins = serializer.Deserialize<IDictionary<int, string>>(json);
+        var json = ReadJson(WellKnown.Export.builtins);
+        var builtins = serializer.Deserialize<IDictionary<string, int>>(json);
 
-        return builtins is not null ? builtins : new Dictionary<int, string>();
+        return builtins is not null ? builtins : new Dictionary<string, int>();
     }
 
     private IDictionary<string, int> GetEntrypoints()
     {
-        var json = ReadJson(WellKnown.Export.entrypoints, releaseFunction: false);
+        var json = ReadJson(WellKnown.Export.entrypoints);
         var entrypoints = serializer.Deserialize<IDictionary<string, int>>(json);
 
         return entrypoints is not null ? entrypoints : new Dictionary<string, int>();
     }
 
-    private string ReadJson(string function, bool releaseFunction) =>
-        runtime.ReadJson(runtime.Invoke<int>(function), releaseFunction);
+    private string ReadJson(string function) =>
+        runtime.ReadJson(runtime.Invoke<int>(function));
 }
