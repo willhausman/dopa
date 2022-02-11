@@ -1,5 +1,6 @@
 namespace CShopa;
 
+using CShopa.Builtins;
 using CShopa.Extensions;
 using Serialization;
 
@@ -22,7 +23,8 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.builtins = builtins;
 
         inputAddress = dataAddress = initialHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
-        this.builtins.BuiltinMap = GetBuiltins();
+
+        this.builtins.ConfigureBuiltinIds(GetBuiltins());
     }
 
     public T? Evaluate<T>(object input) => Evaluate<T>(input, out var _);
@@ -88,7 +90,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
     private IDictionary<string, int> GetBuiltins()
     {
-        var json = ReadJson(WellKnown.Export.builtins);
+        var json = runtime.ReadJson(WellKnown.Export.builtins);
         var builtins = serializer.Deserialize<IDictionary<string, int>>(json);
 
         return builtins is not null ? builtins : new Dictionary<string, int>();
@@ -96,12 +98,9 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
     private IDictionary<string, int> GetEntrypoints()
     {
-        var json = ReadJson(WellKnown.Export.entrypoints);
+        var json = runtime.ReadJson(WellKnown.Export.entrypoints);
         var entrypoints = serializer.Deserialize<IDictionary<string, int>>(json);
 
         return entrypoints is not null ? entrypoints : new Dictionary<string, int>();
     }
-
-    private string ReadJson(string function) =>
-        runtime.ReadJson(runtime.Invoke<int>(function));
 }

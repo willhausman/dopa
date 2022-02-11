@@ -1,9 +1,9 @@
 using CShopa.Extensions;
 using CShopa.Serialization;
 
-namespace CShopa;
+namespace CShopa.Builtins;
 
-public abstract class Builtin
+public abstract class Builtin : IBuiltin
 {
     protected readonly IOpaRuntime runtime;
     protected readonly IOpaSerializer serializer;
@@ -17,24 +17,28 @@ public abstract class Builtin
 
     public string Name { get; }
 
-    public abstract int Invoke(params int[] argAddresses);
+    public abstract int NumberOfArguments { get; }
+
+    public int Invoke(params int[] argAddresses)
+    {
+        if (argAddresses.Length != NumberOfArguments)
+        {
+            throw new ArgumentException($"'{Name}' builtin called with '{argAddresses.Length}' parameters. Expected '{NumberOfArguments}'.");
+        }
+
+        return InvokeCore(argAddresses);
+    }
+
+    protected abstract int InvokeCore(params int[] argAddresses);
 
     protected T? GetArg<T>(int address) =>
         serializer.Deserialize<T>(runtime.ReadJson(address));
-    
+
     protected int Return<T>(T value) =>
         runtime.WriteJson(serializer.Serialize<T>(value));
-
-    protected void ValidateParamsLength(int[] @params, int length)
-    {
-        if (@params.Length != length)
-        {
-            throw new ArgumentException($"'{Name}' builtin called with the wrong number of parameters.");
-        }
-    }
 }
 
-public class Builtin<TResult> : Builtin
+public sealed class Builtin<TResult> : Builtin
 {
     private readonly Func<TResult> callback;
 
@@ -44,11 +48,13 @@ public class Builtin<TResult> : Builtin
         this.callback = callback;
     }
 
-    public override int Invoke(params int[] argAddresses) =>
+    public override int NumberOfArguments => 0;
+
+    protected override int InvokeCore(params int[] argAddresses) =>
         Return(callback());
 }
 
-public class Builtin<TArg, TResult> : Builtin
+public sealed class Builtin<TArg, TResult> : Builtin
 {
     private readonly Func<TArg, TResult> callback;
 
@@ -58,15 +64,16 @@ public class Builtin<TArg, TResult> : Builtin
         this.callback = callback;
     }
 
-    public override int Invoke(params int[] argAddresses)
+    public override int NumberOfArguments => 1;
+
+    protected override int InvokeCore(params int[] argAddresses)
     {
-        ValidateParamsLength(argAddresses, 1);
         var result = callback(GetArg<TArg>(argAddresses[0])!);
         return Return(result);
     }
 }
 
-public class Builtin<TArg1, TArg2, TResult> : Builtin
+public sealed class Builtin<TArg1, TArg2, TResult> : Builtin
 {
     private readonly Func<TArg1, TArg2, TResult> callback;
 
@@ -76,9 +83,10 @@ public class Builtin<TArg1, TArg2, TResult> : Builtin
         this.callback = callback;
     }
 
-    public override int Invoke(params int[] argAddresses)
+    public override int NumberOfArguments => 2;
+
+    protected override int InvokeCore(params int[] argAddresses)
     {
-        ValidateParamsLength(argAddresses, 2);
         var result = callback(
             GetArg<TArg1>(argAddresses[0])!,
             GetArg<TArg2>(argAddresses[1])!);
@@ -86,7 +94,7 @@ public class Builtin<TArg1, TArg2, TResult> : Builtin
     }
 }
 
-public class Builtin<TArg1, TArg2, TArg3, TResult> : Builtin
+public sealed class Builtin<TArg1, TArg2, TArg3, TResult> : Builtin
 {
     private readonly Func<TArg1, TArg2, TArg3, TResult> callback;
 
@@ -96,9 +104,10 @@ public class Builtin<TArg1, TArg2, TArg3, TResult> : Builtin
         this.callback = callback;
     }
 
-    public override int Invoke(params int[] argAddresses)
+    public override int NumberOfArguments => 3;
+
+    protected override int InvokeCore(params int[] argAddresses)
     {
-        ValidateParamsLength(argAddresses, 3);
         var result = callback(
             GetArg<TArg1>(argAddresses[0])!,
             GetArg<TArg2>(argAddresses[1])!,
@@ -107,7 +116,7 @@ public class Builtin<TArg1, TArg2, TArg3, TResult> : Builtin
     }
 }
 
-public class Builtin<TArg1, TArg2, TArg3, TArg4, TResult> : Builtin
+public sealed class Builtin<TArg1, TArg2, TArg3, TArg4, TResult> : Builtin
 {
     private readonly Func<TArg1, TArg2, TArg3, TArg4, TResult> callback;
 
@@ -117,9 +126,10 @@ public class Builtin<TArg1, TArg2, TArg3, TArg4, TResult> : Builtin
         this.callback = callback;
     }
 
-    public override int Invoke(params int[] argAddresses)
+    public override int NumberOfArguments => 4;
+
+    protected override int InvokeCore(params int[] argAddresses)
     {
-        ValidateParamsLength(argAddresses, 4);
         var result = callback(
             GetArg<TArg1>(argAddresses[0])!,
             GetArg<TArg2>(argAddresses[1])!,
