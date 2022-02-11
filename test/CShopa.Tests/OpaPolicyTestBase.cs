@@ -2,7 +2,7 @@ using Xunit;
 
 namespace CShopa.Tests;
 
-[Collection(nameof(OpaPolicyCollection))]
+[Collection(nameof(RuntimeCollection))]
 public abstract class OpaPolicyTestBase
 {
     private readonly RuntimeFixture fixture;

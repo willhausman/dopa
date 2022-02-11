@@ -6,6 +6,8 @@ public class WasmModule : Disposable, IWasmModule
 {
     private readonly Module module;
 
+    public ICollection<string> Exports => Array.Empty<string>();
+
     private WasmModule(Module  module)
     {
         this.module = module;

@@ -9,6 +9,11 @@ public class OpaModule : Disposable, IOpaModule
 
     public OpaModule(IWasmModule module)
     {
+        if (module.Exports.Any() && !module.Exports.Contains(WellKnown.Export.opa_eval))
+        {
+            throw new ArgumentException("The WASM does not export the required 'opa_eval' function from ABI version 1.2.", nameof(module));
+        }
+
         this.module = module;
     }
 

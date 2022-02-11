@@ -11,7 +11,10 @@ public class WasmModule : Disposable, IWasmModule
     {
         this.engine = engine;
         this.module = module;
+        Exports = module.Exports.Select(e => e.Name).ToHashSet();
     }
+
+    public ICollection<string> Exports { get; }
 
     public IOpaRuntime CreateRuntime(IBuiltinCollection collection)
     {
