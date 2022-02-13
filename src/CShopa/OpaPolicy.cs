@@ -9,6 +9,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
     private readonly IOpaRuntime runtime;
     private readonly IOpaSerializer serializer;
     private readonly IBuiltinCollection builtins;
+    private readonly IDictionary<string, int> entrypoints;
 
     // memory is structured to re-evaluate from heap pointer following this general structure: | data | input data | <- evaluation starts after input data
     // the pointers and addresses returned from the OPA assembly are int32.
@@ -25,22 +26,47 @@ public class OpaPolicy : Disposable, IOpaPolicy
         inputAddress = dataAddress = initialHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
 
         this.builtins.ConfigureBuiltinIds(GetBuiltins());
+        this.entrypoints = GetEntrypoints();
     }
 
-    public T? Evaluate<T>(object input) => Evaluate<T>(input, out var _);
+    public T? Evaluate<T>() => EvaluateAt<T>("", "", out var _);
 
-    public T? Evaluate<T>(object input, out string responseJson)
+    public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>("", "", out responseJson);
+
+    public T? Evaluate<T>(object input) => EvaluateAt<T>("", input, out var _);
+
+    public T? Evaluate<T>(object input, out string responseJson) => EvaluateAt<T>("", input, out responseJson);
+
+    public T? EvaluateAt<T>(string entrypoint) => EvaluateAt<T>(entrypoint, "", out var _);
+
+    public T? EvaluateAt<T>(string entrypoint, out string responseJson) => EvaluateAt<T>(entrypoint, "", out responseJson);
+
+    public T? EvaluateAt<T>(string entrypoint, object input) => EvaluateAt<T>(entrypoint, input, out var _);
+
+    public T? EvaluateAt<T>(string entrypoint, object input, out string responseJson)
     {
-        responseJson = EvaluateJson(serializer.Serialize(input));
+        responseJson = EvaluateJsonAt(entrypoint, serializer.Serialize(input));
         var response = serializer.Deserialize<IEnumerable<IDictionary<string, T>>>(responseJson)?.Select(d => d["result"]);
         return response is not null ? response.FirstOrDefault() : default;
     }
 
-    public string EvaluateJson(string json)
+    public string EvaluateJson() => EvaluateJsonAt("", "\"\"");
+
+    public string EvaluateJson(string json) => EvaluateJsonAt("", json);
+
+    public string EvaluateJsonAt(string entrypoint) => EvaluateJsonAt(entrypoint, "\"\"");
+
+    public string EvaluateJsonAt(string entrypoint, string json)
+    {
+        var entrypointId = 0;
+        entrypoints.TryGetValue(entrypoint, out entrypointId);
+        return Evaluate(entrypointId, json);
+    }
+
+    private string Evaluate(int entrypoint, string json)
     {
         var opaReservedParam = 0;
         var jsonFormat = 0;
-        var entrypoint = 0;
         runtime.WriteValueAt(inputAddress, json); // always reset input json
 
         var address = runtime.Invoke<int>(

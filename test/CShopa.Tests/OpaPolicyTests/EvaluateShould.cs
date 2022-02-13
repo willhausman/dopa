@@ -29,7 +29,7 @@ public class EvaluateShould : OpaPolicyTestBase
     public void HonorDefaultResponse(Runtime runtime)
     {
         var policy = ExamplePolicy(runtime);
-        var result = policy.Evaluate<bool>(new { message = "hello" });
+        var result = policy.Evaluate<bool>();
         result.Should().BeFalse();
     }
 

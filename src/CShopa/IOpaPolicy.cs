@@ -2,11 +2,29 @@
 
 public interface IOpaPolicy : IDisposable
 {
+    T? Evaluate<T>();
+
+    T? Evaluate<T>(out string responseJson);
+
     T? Evaluate<T>(object input);
 
     T? Evaluate<T>(object input, out string responseJson);
 
+    T? EvaluateAt<T>(string entrypoint);
+
+    T? EvaluateAt<T>(string entrypoint, object input);
+
+    T? EvaluateAt<T>(string entrypoint, out string responseJson);
+
+    T? EvaluateAt<T>(string entrypoint, object input, out string responseJson);
+
+    string EvaluateJson();
+
     string EvaluateJson(string json);
+
+    string EvaluateJsonAt(string entrypoint);
+
+    string EvaluateJsonAt(string entrypoint, string json);
 
     void SetData<T>(T input);
 
