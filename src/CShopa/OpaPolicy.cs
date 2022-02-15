@@ -81,6 +81,8 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
         var result = runtime.ReadValueAt(address);
 
+        runtime.ReleaseMemory(address);
+
         return result;
     }
 
