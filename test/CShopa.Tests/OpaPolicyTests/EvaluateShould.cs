@@ -26,6 +26,22 @@ public class EvaluateShould : OpaPolicyTestBase
     [Theory]
     [InlineData(Runtime.Wasmtime)]
     [InlineData(Runtime.Wasmer)]
+    public void ReturnSameResultWhenRerun(Runtime runtime)
+    {
+        var input = new { message = "hello" };
+        var policy = ExamplePolicy(runtime);
+        policy.SetData(new { world = "hello" });
+
+        var result1 = policy.Evaluate<bool>(input);
+        var result2 = policy.Evaluate<bool>(input);
+
+        result1.Should().BeTrue();
+        result2.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData(Runtime.Wasmtime)]
+    [InlineData(Runtime.Wasmer)]
     public void HonorDefaultResponse(Runtime runtime)
     {
         var policy = ExamplePolicy(runtime);
