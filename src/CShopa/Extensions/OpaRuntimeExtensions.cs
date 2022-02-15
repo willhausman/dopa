@@ -24,8 +24,13 @@ public static class OpaRuntimeExtensions
         return result;
     }
 
-    public static string ReadJson(this IOpaRuntime runtime, string function) =>
-        runtime.ReadJson(runtime.Invoke<int>(function));
+    public static string ReadJson(this IOpaRuntime runtime, string function)
+    {
+        var address = runtime.Invoke<int>(function);
+        var json = runtime.ReadJson(address);
+        runtime.ReleaseMemory(address);
+        return json;
+    }
 
     public static int ReserveMemory(this IOpaRuntime runtime, int length) =>
         runtime.Invoke<int>(WellKnown.Export.opa_malloc, length);

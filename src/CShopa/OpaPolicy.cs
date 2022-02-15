@@ -91,6 +91,11 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
     public void SetDataJson(string json)
     {
+        if (dataAddress != initialHeapPointer)
+        {
+            runtime.ReleaseMemory(dataAddress);
+        }
+
         runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, initialHeapPointer); // rewind time and start over
         dataAddress = runtime.WriteJson(json);
         inputAddress = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
