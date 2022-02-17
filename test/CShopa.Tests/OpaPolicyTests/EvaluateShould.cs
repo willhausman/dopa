@@ -62,4 +62,19 @@ public class EvaluateShould : OpaPolicyTestBase
         result.Should().BeTrue();
         json.Should().Be(@"[{""result"":true}]");
     }
+
+    [Theory]
+    [InlineData(Runtime.Wasmtime)]
+    [InlineData(Runtime.Wasmer)]
+    public void AccommodateMemoryBeyondCurrentPage(Runtime runtime)
+    {
+        var policy = ExamplePolicy(runtime);
+        policy.SetData(new { world = "hello" });
+
+        int fileSizeInKB = (1024 * 100); // 100KB
+        var longMessage = new string('A', fileSizeInKB);
+        var result = policy.Evaluate<bool>(new { message = "hello", longMessage });
+
+        result.Should().BeTrue();
+    }
 }

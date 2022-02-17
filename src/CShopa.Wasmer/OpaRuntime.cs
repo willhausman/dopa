@@ -5,6 +5,7 @@ namespace CShopa.Wasmer;
 
 internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {
+    private const double PageSize = 65536; // bytes size of a WebAssembly memory page
     private Memory memory;
     private Instance instance;
 
@@ -16,9 +17,19 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
 
     public string ReadValueAt(int address) =>
         memory.ReadNullTerminatedString(address);
-    
-    public void WriteValueAt(int address, string json) =>
+
+    public void WriteValueAt(int address, string json)
+    {
+        var requiredPages = (uint)Math.Ceiling((address + json.Length) / PageSize);
+        var pagesToAdd = requiredPages - memory.PageLength;
+
+        if (pagesToAdd > 0)
+        {
+            memory.Grow(pagesToAdd);
+        }
+
         memory.WriteString(address, json);
+    }
 
     public void Invoke(string function, params object[] rest)
     {

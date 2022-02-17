@@ -24,8 +24,18 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
     public string ReadValueAt(int address) =>
         memory.ReadNullTerminatedString(store, address);
 
-    public void WriteValueAt(int address, string json) =>
+    public void WriteValueAt(int address, string json)
+    {
+        var requiredPages = (uint)Math.Ceiling((address + json.Length) / (double)Memory.PageSize);
+        var pagesToAdd = requiredPages - memory.GetSize(store);
+
+        if (pagesToAdd > 0)
+        {
+            memory.Grow(store, pagesToAdd);
+        }
+
         memory.WriteString(store, address, json);
+    }
 
     public void Invoke(string function, params object[] rest)
     {
