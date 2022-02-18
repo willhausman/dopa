@@ -29,13 +29,6 @@
     <ProjectReference Include="..\..\src\CShopa.Wasmer\CShopa.Wasmer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="policies\builtins.wasm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="policies\example.wasm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  <Import Project="..\test.proj" />
 
 </Project>
