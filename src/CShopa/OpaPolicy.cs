@@ -13,6 +13,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
     // the pointers and addresses returned from the OPA assembly are int32.
     private int initialHeapPointer;
+    private int executionHeapPointer;
     private int dataAddress;
 
     public OpaPolicy(IOpaRuntime runtime, IOpaSerializer serializer, IBuiltinCollection builtins)
@@ -21,7 +22,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.serializer = serializer;
         this.builtins = builtins;
 
-        dataAddress = initialHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
+        dataAddress = initialHeapPointer = executionHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
 
         this.builtins.ConfigureBuiltinIds(GetBuiltins());
         this.entrypoints = GetEntrypoints();
@@ -66,8 +67,8 @@ public class OpaPolicy : Disposable, IOpaPolicy
         var opaReservedParam = 0;
         var jsonFormat = 0;
 
+        runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, executionHeapPointer);
         var inputAddress = runtime.WriteValue(json);
-        var executionPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
 
         var address = runtime.Invoke<int>(
             WellKnown.Export.opa_eval,
@@ -76,7 +77,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
             dataAddress,
             inputAddress,
             json.Length,
-            executionPointer,
+            inputAddress + json.Length,
             jsonFormat);
 
         var result = runtime.ReadValueAt(address);
@@ -98,6 +99,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
         runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, initialHeapPointer); // rewind time and start over
         dataAddress = runtime.WriteJson(json);
+        executionHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
     }
 
     public bool AddBuiltin<TResult>(string name, Func<TResult> callback) =>
