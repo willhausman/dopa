@@ -2,6 +2,12 @@
 
 public interface IOpaPolicy : IDisposable
 {
+    object? Data { get; }
+
+    string? DataJson { get; }
+
+    IReadOnlyCollection<string> Entrypoints { get; }
+
     T? Evaluate<T>();
 
     T? Evaluate<T>(out string responseJson);

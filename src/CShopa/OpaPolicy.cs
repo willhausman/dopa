@@ -28,6 +28,12 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.entrypoints = GetEntrypoints();
     }
 
+    public IReadOnlyCollection<string> Entrypoints => entrypoints.Keys.ToList();
+
+    public object? Data { get; private set; }
+
+    public string? DataJson { get; private set; }
+
     public T? Evaluate<T>() => EvaluateAt<T>("", "", out var _);
 
     public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>("", "", out responseJson);
@@ -87,14 +93,18 @@ public class OpaPolicy : Disposable, IOpaPolicy
         return result;
     }
 
-    public void SetData<T>(T input) =>
+    public void SetData<T>(T input)
+    {
         SetDataJson(serializer.Serialize(input));
+        Data = input;
+    }
 
     public void SetDataJson(string json)
     {
         runtime.ResetHeapTo(initialHeapPointer); // rewind time and start over
         dataAddress = runtime.WriteJson(json);
         executionHeapPointer = runtime.GetCurrentHeap();
+        DataJson = json;
     }
 
     public bool AddBuiltin<TResult>(string name, Func<TResult> callback) =>
@@ -120,16 +130,16 @@ public class OpaPolicy : Disposable, IOpaPolicy
     private IDictionary<string, int> GetBuiltins()
     {
         var json = runtime.ReadJson(WellKnown.Export.builtins);
-        var builtins = serializer.Deserialize<IDictionary<string, int>>(json);
+        var builtins = serializer.Deserialize<Dictionary<string, int>>(json) ?? new();
 
-        return builtins is not null ? builtins : new Dictionary<string, int>();
+        return builtins.WithCaseInsensitiveKeys();
     }
 
     private IDictionary<string, int> GetEntrypoints()
     {
         var json = runtime.ReadJson(WellKnown.Export.entrypoints);
-        var entrypoints = serializer.Deserialize<IDictionary<string, int>>(json);
+        var entrypoints = serializer.Deserialize<Dictionary<string, int>>(json) ?? new();
 
-        return entrypoints is not null ? entrypoints : new Dictionary<string, int>();
+        return entrypoints.WithCaseInsensitiveKeys();
     }
 }

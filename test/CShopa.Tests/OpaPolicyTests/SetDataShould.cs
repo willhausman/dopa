@@ -22,5 +22,7 @@ public class SetDataShould : OpaPolicyTestBase
         var result = policy.Evaluate<bool>(new { message = "hello" });
 
         result.Should().BeTrue();
+        policy.Data.Should().BeEquivalentTo(new { world = "hello" });
+        policy.DataJson.Should().Be(@"{""world"":""hello""}");
     }
 }

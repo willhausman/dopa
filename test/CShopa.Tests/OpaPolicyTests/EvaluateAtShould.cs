@@ -22,6 +22,7 @@ public class EvaluateAtShould : OpaPolicyTestBase
         policy.AddBuiltin("custom.builtin3", (int i, int j, int k) => 0);
         policy.AddBuiltin("custom.builtin4", (int i, int j, int k, int l) => 0);
 
+        policy.Entrypoints.Should().Contain("builtins/sdkBuiltinValue");
         var result = policy.EvaluateAt<string>("builtins/sdkBuiltinValue") ?? throw new NullReferenceException();
         result.Should().Be("number");
     }
