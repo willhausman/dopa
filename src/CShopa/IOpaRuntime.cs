@@ -28,7 +28,7 @@ public interface IOpaRuntime : IDisposable
     /// <summary>
     /// Writes json to the shared memory buffer.
     /// </summary>
-    /// <param name="address">The address to start writing at.</param>
     /// <param name="json">The json to put into the shared memory.</param>
-    void WriteValueAt(int address, string json);
+    /// <returns>The address where the value was written.</returns>
+    int WriteValue(string json);
 }

@@ -4,8 +4,7 @@ public static class OpaRuntimeExtensions
 {
     public static int WriteJson(this IOpaRuntime runtime, string json)
     {
-        var address = runtime.ReserveMemory(json.Length);
-        runtime.WriteValueAt(address, json);
+        var address = runtime.WriteValue(json);
 
         var resultAddress = runtime.Invoke<int>(WellKnown.Export.opa_json_parse, address, json.Length);
 
@@ -31,10 +30,7 @@ public static class OpaRuntimeExtensions
         runtime.ReleaseMemory(address);
         return json;
     }
-
-    public static int ReserveMemory(this IOpaRuntime runtime, int length) =>
-        runtime.Invoke<int>(WellKnown.Export.opa_malloc, length);
     
-    public static void ReleaseMemory(this IOpaRuntime runtime, int address) =>
-        runtime.Invoke(WellKnown.Export.opa_free, address);
+    public static void ReleaseMemory(this IOpaRuntime runtime, params int[] addresses) =>
+        addresses.ForEach(address => runtime.Invoke(WellKnown.Export.opa_free, address));
 }

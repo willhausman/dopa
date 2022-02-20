@@ -11,11 +11,10 @@ public class OpaPolicy : Disposable, IOpaPolicy
     private readonly IBuiltinCollection builtins;
     private readonly IDictionary<string, int> entrypoints;
 
-    // memory is structured to re-evaluate from heap pointer following this general structure: | data | input data | <- evaluation starts after input data
     // the pointers and addresses returned from the OPA assembly are int32.
     private int initialHeapPointer;
+    private int executionHeapPointer;
     private int dataAddress;
-    private int inputAddress;
 
     public OpaPolicy(IOpaRuntime runtime, IOpaSerializer serializer, IBuiltinCollection builtins)
     {
@@ -23,7 +22,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.serializer = serializer;
         this.builtins = builtins;
 
-        inputAddress = dataAddress = initialHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
+        dataAddress = initialHeapPointer = executionHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
 
         this.builtins.ConfigureBuiltinIds(GetBuiltins());
         this.entrypoints = GetEntrypoints();
@@ -67,21 +66,23 @@ public class OpaPolicy : Disposable, IOpaPolicy
     {
         var opaReservedParam = 0;
         var jsonFormat = 0;
-        runtime.WriteValueAt(inputAddress, json); // always reset input json
+
+        runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, executionHeapPointer);
+        var inputAddress = runtime.WriteValue(json);
 
         var address = runtime.Invoke<int>(
             WellKnown.Export.opa_eval,
             opaReservedParam,
             entrypoint,
-            dataAddress, // address of stored data
-            inputAddress, // where we wrote the input json to. This is actually the current execution heap pointer. We're offsetting it
-            json.Length, // length of input json to offset the current execution heap pointer
-            inputAddress + json.Length, // new heap pointer to start execution
+            dataAddress,
+            inputAddress,
+            json.Length,
+            inputAddress + json.Length,
             jsonFormat);
 
         var result = runtime.ReadValueAt(address);
 
-        runtime.ReleaseMemory(address);
+        runtime.ReleaseMemory(address, inputAddress);
 
         return result;
     }
@@ -98,7 +99,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
         runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, initialHeapPointer); // rewind time and start over
         dataAddress = runtime.WriteJson(json);
-        inputAddress = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
+        executionHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
     }
 
     public bool AddBuiltin<TResult>(string name, Func<TResult> callback) =>

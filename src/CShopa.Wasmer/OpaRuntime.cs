@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using WasmerSharp;
 
 namespace CShopa.Wasmer;
@@ -18,17 +17,11 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
     public string ReadValueAt(int address) =>
         memory.ReadNullTerminatedString(address);
 
-    public void WriteValueAt(int address, string json)
+    public int WriteValue(string json)
     {
-        var requiredPages = (uint)Math.Ceiling((address + json.Length) / PageSize);
-        var pagesToAdd = requiredPages - memory.PageLength;
-
-        if (pagesToAdd > 0)
-        {
-            memory.Grow(pagesToAdd);
-        }
-
+        var address = Invoke<int>(WellKnown.Export.opa_malloc, json.Length);
         memory.WriteString(address, json);
+        return address;
     }
 
     public void Invoke(string function, params object[] rest)
