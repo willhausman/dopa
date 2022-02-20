@@ -33,4 +33,10 @@ public static class OpaRuntimeExtensions
     
     public static void ReleaseMemory(this IOpaRuntime runtime, params int[] addresses) =>
         addresses.ForEach(address => runtime.Invoke(WellKnown.Export.opa_free, address));
+
+    public static void ResetHeapTo(this IOpaRuntime runtime, int address) =>
+        runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, address);
+    
+    public static int GetCurrentHeap(this IOpaRuntime runtime) =>
+        runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
 }

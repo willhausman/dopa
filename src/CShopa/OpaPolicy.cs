@@ -22,7 +22,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
         this.serializer = serializer;
         this.builtins = builtins;
 
-        dataAddress = initialHeapPointer = executionHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
+        dataAddress = initialHeapPointer = executionHeapPointer = runtime.GetCurrentHeap();
 
         this.builtins.ConfigureBuiltinIds(GetBuiltins());
         this.entrypoints = GetEntrypoints();
@@ -67,7 +67,7 @@ public class OpaPolicy : Disposable, IOpaPolicy
         var opaReservedParam = 0;
         var jsonFormat = 0;
 
-        runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, executionHeapPointer);
+        runtime.ResetHeapTo(executionHeapPointer);
         var inputAddress = runtime.WriteValue(json);
 
         var address = runtime.Invoke<int>(
@@ -92,14 +92,9 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
     public void SetDataJson(string json)
     {
-        if (dataAddress != initialHeapPointer)
-        {
-            runtime.ReleaseMemory(dataAddress);
-        }
-
-        runtime.Invoke(WellKnown.Export.opa_heap_ptr_set, initialHeapPointer); // rewind time and start over
+        runtime.ResetHeapTo(initialHeapPointer); // rewind time and start over
         dataAddress = runtime.WriteJson(json);
-        executionHeapPointer = runtime.Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
+        executionHeapPointer = runtime.GetCurrentHeap();
     }
 
     public bool AddBuiltin<TResult>(string name, Func<TResult> callback) =>
