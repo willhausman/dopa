@@ -91,4 +91,9 @@ public static class WellKnown
     {
         public const int MinimumMemorySize = 2;
     }
+
+    public static class Values
+    {
+        public const int DefaultEntrypointId = 0;
+    }
 }

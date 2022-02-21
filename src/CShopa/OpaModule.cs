@@ -1,4 +1,5 @@
 ﻿using CShopa.Builtins;
+using CShopa.Extensions;
 using CShopa.Serialization;
 
 namespace CShopa;
@@ -20,12 +21,14 @@ public class OpaModule : Disposable, IOpaModule
 
     public IOpaPolicy CreatePolicy()
     {
-        var collection = new BuiltinCollection();
-        var runtime = module.CreateRuntime(collection);
-
-        var policy = new OpaPolicy(runtime, serializer, collection);
+        var builtins = new BuiltinCollection();
+        var runtime = module.CreateRuntime(builtins);
+        var entrypoints = new EntrypointCollection(runtime.GetEntrypoints());
+        builtins.ConfigureBuiltinIds(runtime.GetBuiltins());
 
         // this.builtins.ForEach(b => collection.AddBuiltin(b));
+
+        var policy = new OpaPolicy(runtime, serializer, builtins, entrypoints);
 
         return policy;
     }

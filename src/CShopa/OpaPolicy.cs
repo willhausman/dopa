@@ -9,38 +9,42 @@ public class OpaPolicy : Disposable, IOpaPolicy
     private readonly IOpaRuntime runtime;
     private readonly IOpaSerializer serializer;
     private readonly IBuiltinCollection builtins;
-    private readonly IDictionary<string, int> entrypoints;
+    private readonly IEntrypointCollection entrypoints;
 
     // the pointers and addresses returned from the OPA assembly are int32.
     private int initialHeapPointer;
     private int executionHeapPointer;
     private int dataAddress;
 
-    public OpaPolicy(IOpaRuntime runtime, IOpaSerializer serializer, IBuiltinCollection builtins)
+    public OpaPolicy(IOpaRuntime runtime, IOpaSerializer serializer, IBuiltinCollection builtins,  IEntrypointCollection entrypoints)
     {
         this.runtime = runtime;
         this.serializer = serializer;
         this.builtins = builtins;
+        this.entrypoints = entrypoints;
 
         dataAddress = initialHeapPointer = executionHeapPointer = runtime.GetCurrentHeap();
-
-        this.builtins.ConfigureBuiltinIds(GetBuiltins());
-        this.entrypoints = GetEntrypoints();
     }
 
-    public IReadOnlyCollection<string> Entrypoints => entrypoints.Keys.ToList();
+    public IReadOnlyCollection<string> Entrypoints => entrypoints.Entrypoints;
+
+    public string DefaultEntrypoint
+    {
+        get { return entrypoints.DefaultEntrypoint; }
+        set { entrypoints.DefaultEntrypoint = value; }
+    }
 
     public object? Data { get; private set; }
 
     public string? DataJson { get; private set; }
 
-    public T? Evaluate<T>() => EvaluateAt<T>("", "", out var _);
+    public T? Evaluate<T>() => EvaluateAt<T>(DefaultEntrypoint, "", out var _);
 
-    public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>("", "", out responseJson);
+    public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, "", out responseJson);
 
-    public T? Evaluate<T>(object input) => EvaluateAt<T>("", input, out var _);
+    public T? Evaluate<T>(object input) => EvaluateAt<T>(DefaultEntrypoint, input, out var _);
 
-    public T? Evaluate<T>(object input, out string responseJson) => EvaluateAt<T>("", input, out responseJson);
+    public T? Evaluate<T>(object input, out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, input, out responseJson);
 
     public T? EvaluateAt<T>(string entrypoint) => EvaluateAt<T>(entrypoint, "", out var _);
 
@@ -55,16 +59,15 @@ public class OpaPolicy : Disposable, IOpaPolicy
         return response is not null ? response.FirstOrDefault() : default;
     }
 
-    public string EvaluateJson() => EvaluateJsonAt("", "\"\"");
+    public string EvaluateJson() => EvaluateJsonAt(DefaultEntrypoint, "\"\"");
 
-    public string EvaluateJson(string json) => EvaluateJsonAt("", json);
+    public string EvaluateJson(string json) => EvaluateJsonAt(DefaultEntrypoint, json);
 
     public string EvaluateJsonAt(string entrypoint) => EvaluateJsonAt(entrypoint, "\"\"");
 
     public string EvaluateJsonAt(string entrypoint, string json)
     {
-        var entrypointId = 0;
-        entrypoints.TryGetValue(entrypoint, out entrypointId);
+        var entrypointId = entrypoints[entrypoint];
         return Evaluate(entrypointId, json);
     }
 
@@ -125,21 +128,5 @@ public class OpaPolicy : Disposable, IOpaPolicy
     protected override void DisposeManaged()
     {
         this.runtime.Dispose();
-    }
-
-    private IDictionary<string, int> GetBuiltins()
-    {
-        var json = runtime.ReadJson(WellKnown.Export.builtins);
-        var builtins = serializer.Deserialize<Dictionary<string, int>>(json) ?? new();
-
-        return builtins.WithCaseInsensitiveKeys();
-    }
-
-    private IDictionary<string, int> GetEntrypoints()
-    {
-        var json = runtime.ReadJson(WellKnown.Export.entrypoints);
-        var entrypoints = serializer.Deserialize<Dictionary<string, int>>(json) ?? new();
-
-        return entrypoints.WithCaseInsensitiveKeys();
     }
 }

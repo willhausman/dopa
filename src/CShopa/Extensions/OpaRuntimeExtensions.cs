@@ -1,3 +1,6 @@
+using System.Text.Json;
+using CShopa.Serialization;
+
 namespace CShopa.Extensions;
 
 public static class OpaRuntimeExtensions
@@ -29,6 +32,22 @@ public static class OpaRuntimeExtensions
         var json = runtime.ReadJson(address);
         runtime.ReleaseMemory(address);
         return json;
+    }
+
+    public static IDictionary<string, int> GetBuiltins(this IOpaRuntime runtime)
+    {
+        var json = runtime.ReadJson(WellKnown.Export.builtins);
+        var builtins = JsonSerializer.Deserialize<Dictionary<string, int>>(json, OpaSerializerOptions.Default) ?? new();
+
+        return builtins.WithCaseInsensitiveKeys();
+    }
+
+    public static IDictionary<string, int> GetEntrypoints(this IOpaRuntime runtime)
+    {
+        var json = runtime.ReadJson(WellKnown.Export.entrypoints);
+        var entrypoints = JsonSerializer.Deserialize<Dictionary<string, int>>(json, OpaSerializerOptions.Default) ?? new();
+
+        return entrypoints.WithCaseInsensitiveKeys();
     }
     
     public static void ReleaseMemory(this IOpaRuntime runtime, params int[] addresses) =>
