@@ -6,6 +6,8 @@ using Serialization;
 
 public class OpaPolicy : Disposable, IOpaPolicy
 {
+    private const string emptyInput = "";
+    private const string emptyJson = "\"\"";
     private readonly IOpaRuntime runtime;
     private readonly IOpaSerializer serializer;
     private readonly IBuiltinCollection builtins;
@@ -38,17 +40,17 @@ public class OpaPolicy : Disposable, IOpaPolicy
 
     public string? DataJson { get; private set; }
 
-    public T? Evaluate<T>() => EvaluateAt<T>(DefaultEntrypoint, "", out var _);
+    public T? Evaluate<T>() => EvaluateAt<T>(DefaultEntrypoint, emptyInput, out var _);
 
-    public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, "", out responseJson);
+    public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, emptyInput, out responseJson);
 
     public T? Evaluate<T>(object input) => EvaluateAt<T>(DefaultEntrypoint, input, out var _);
 
     public T? Evaluate<T>(object input, out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, input, out responseJson);
 
-    public T? EvaluateAt<T>(string entrypoint) => EvaluateAt<T>(entrypoint, "", out var _);
+    public T? EvaluateAt<T>(string entrypoint) => EvaluateAt<T>(entrypoint, emptyInput, out var _);
 
-    public T? EvaluateAt<T>(string entrypoint, out string responseJson) => EvaluateAt<T>(entrypoint, "", out responseJson);
+    public T? EvaluateAt<T>(string entrypoint, out string responseJson) => EvaluateAt<T>(entrypoint, emptyInput, out responseJson);
 
     public T? EvaluateAt<T>(string entrypoint, object input) => EvaluateAt<T>(entrypoint, input, out var _);
 
@@ -59,11 +61,11 @@ public class OpaPolicy : Disposable, IOpaPolicy
         return response is not null ? response.FirstOrDefault() : default;
     }
 
-    public string EvaluateJson() => EvaluateJsonAt(DefaultEntrypoint, "\"\"");
+    public string EvaluateJson() => EvaluateJsonAt(DefaultEntrypoint, emptyJson);
 
     public string EvaluateJson(string json) => EvaluateJsonAt(DefaultEntrypoint, json);
 
-    public string EvaluateJsonAt(string entrypoint) => EvaluateJsonAt(entrypoint, "\"\"");
+    public string EvaluateJsonAt(string entrypoint) => EvaluateJsonAt(entrypoint, emptyJson);
 
     public string EvaluateJsonAt(string entrypoint, string json)
     {
