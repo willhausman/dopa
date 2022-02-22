@@ -10,6 +10,12 @@ public class EntrypointCollection : IEntrypointCollection
     public EntrypointCollection(IDictionary<string, int> entrypoints)
     {
         this.entrypoints = entrypoints;
+
+        if (!entrypoints.Values.Any(v => v == defaultEntrypointId))
+        {
+            throw new ArgumentException("Default entrypoint is expected.", nameof(entrypoints));
+        }
+
         defaultEntrypoint = entrypoints.First(kvp => kvp.Value == defaultEntrypointId).Key;
     }
 
