@@ -7,7 +7,7 @@ public class WasmModule : Disposable, IWasmModule
     private readonly Engine engine;
     private readonly Module module;
 
-    private WasmModule(Engine engine, Module  module)
+    private WasmModule(Engine engine, Module module)
     {
         this.engine = engine;
         this.module = module;
@@ -31,6 +31,20 @@ public class WasmModule : Disposable, IWasmModule
     {
         var engine = new Engine();
         var module = new WasmModule(engine, Module.FromFile(engine, filePath));
+        return new OpaModule(module);
+    }
+
+    public static IOpaModule FromStream(string name, Stream stream)
+    {
+        var engine = new Engine();
+        var module = new WasmModule(engine, Module.FromStream(engine, name, stream));
+        return new OpaModule(module);
+    }
+
+    public static IOpaModule FromBytes(string name, byte[] content)
+    {
+        var engine = new Engine();
+        var module = new WasmModule(engine, Module.FromBytes(engine, name, content));
         return new OpaModule(module);
     }
 

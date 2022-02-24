@@ -4,7 +4,7 @@ using CShopa.Builtins;
 using CShopa.Extensions;
 using Serialization;
 
-public class OpaPolicy : Disposable, IOpaPolicy
+public sealed class OpaPolicy : Disposable, IOpaPolicy
 {
     private const string emptyInput = "";
     private const string emptyJson = "\"\"";
