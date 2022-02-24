@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Wasmtime;
 
-namespace CShopa.Wasmtime;
+namespace CShopa.Runtime;
 
 internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {

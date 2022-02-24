@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-
 namespace CShopa.Extensions;
 
 public static class EnumerableExtensions

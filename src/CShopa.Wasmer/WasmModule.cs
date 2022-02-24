@@ -6,7 +6,8 @@ public class WasmModule : Disposable, IWasmModule
 {
     private readonly Module module;
 
-    public ICollection<string> Exports => Array.Empty<string>();
+    // WasmerSharp throws an exception trying to get its exports. Really, this is just POC for using another runtime.
+    public ICollection<string> Exports => new[] { WellKnown.Export.opa_eval };
 
     private WasmModule(Module  module)
     {

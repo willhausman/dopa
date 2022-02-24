@@ -1,6 +1,6 @@
 using Wasmtime;
 
-namespace CShopa.Wasmtime;
+namespace CShopa.Runtime;
 
 public class WasmModule : Disposable, IWasmModule
 {

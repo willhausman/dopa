@@ -1,5 +1,5 @@
 using BenchmarkDotNet.Attributes;
-using CShopa.Wasmtime;
+using CShopa.Runtime;
 
 namespace CShopa.Benchmarks;
 

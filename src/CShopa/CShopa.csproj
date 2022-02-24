@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Wasmtime" Version="0.34.0-preview1" />
+  </ItemGroup>
+
 </Project>

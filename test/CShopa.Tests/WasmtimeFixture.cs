@@ -1,5 +1,5 @@
 using CShopa.Extensions;
-using CShopa.Wasmtime;
+using CShopa.Runtime;
 
 namespace CShopa.Tests;
 

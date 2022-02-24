@@ -1,7 +1,7 @@
 using CShopa.Exceptions;
 using Wasmtime;
 
-namespace CShopa.Wasmtime
+namespace CShopa.Runtime
 {
     public static class LinkerExtensions
     {
