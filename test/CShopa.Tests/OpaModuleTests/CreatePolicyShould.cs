@@ -15,9 +15,9 @@ public class CreatePolicyShould : OpaModuleTestBase
     [InlineData(Runtime.Wasmer)]
     public void ReturnAPolicy(Runtime runtime)
     {
-        var module = ExampleModule(runtime);
+        using var module = ExampleModule(runtime);
 
-        var policy = module.CreatePolicy();
+        using var policy = module.CreatePolicy();
 
         policy.Should().NotBeNull();
     }

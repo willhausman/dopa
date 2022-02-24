@@ -15,7 +15,7 @@ public class EvaluateShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void ReturnSimpleEvaluateWithData(Runtime runtime)
     {
-        var policy = ExamplePolicy(runtime);
+        using var policy = ExamplePolicy(runtime);
         policy.SetData(new { world = "hello" });
 
         var result = policy.Evaluate<bool>(new { message = "hello" });
@@ -29,7 +29,7 @@ public class EvaluateShould : OpaPolicyTestBase
     public void ReturnSameResultWhenRerun(Runtime runtime)
     {
         var input = new { message = "hello" };
-        var policy = ExamplePolicy(runtime);
+        using var policy = ExamplePolicy(runtime);
         policy.SetData(new { world = "hello" });
 
         var result1 = policy.Evaluate<bool>(input);
@@ -44,7 +44,7 @@ public class EvaluateShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void HonorDefaultResponse(Runtime runtime)
     {
-        var policy = ExamplePolicy(runtime);
+        using var policy = ExamplePolicy(runtime);
         var result = policy.Evaluate<bool>();
         result.Should().BeFalse();
     }
@@ -54,7 +54,7 @@ public class EvaluateShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void ReturnJson(Runtime runtime)
     {
-        var policy = ExamplePolicy(runtime);
+        using var policy = ExamplePolicy(runtime);
         policy.SetData(new { world = "hello" });
 
         var result = policy.Evaluate<bool>(new { message = "hello" }, out var json);
@@ -68,7 +68,7 @@ public class EvaluateShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void AccommodateMemoryBeyondCurrentPage(Runtime runtime)
     {
-        var policy = ExamplePolicy(runtime);
+        using var policy = ExamplePolicy(runtime);
         policy.SetData(new { world = "hello" });
 
         int fileSizeInKB = (1024 * 100); // 100KB

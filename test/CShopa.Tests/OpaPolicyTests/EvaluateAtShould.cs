@@ -15,7 +15,7 @@ public class EvaluateAtShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void ReturnValueForEntrypoint(Runtime runtime)
     {
-        var policy = BuiltinsPolicy(runtime);
+        using var policy = BuiltinsPolicy(runtime);
         policy.AddBuiltin("custom.builtin0", () => 0);
         policy.AddBuiltin("custom.builtin1", (int i) => 0);
         policy.AddBuiltin("custom.builtin2", (int i, int j) => 0);
