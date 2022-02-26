@@ -15,7 +15,7 @@ public class SetDataShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void OverwritePreviousData(Runtime runtime)
     {
-        var policy = ExamplePolicy(runtime);
+        using var policy = ExamplePolicy(runtime);
         policy.SetData(new { some="other object" });
         policy.SetData(new { world = "hello" });
 

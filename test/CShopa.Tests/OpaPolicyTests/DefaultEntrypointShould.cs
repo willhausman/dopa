@@ -15,7 +15,7 @@ public class DefaultEntrypointShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void ReturnValueForChangedDefault(Runtime runtime)
     {
-        var policy = BuiltinsPolicy(runtime);
+        using var policy = BuiltinsPolicy(runtime);
         policy.AddBuiltin("custom.builtin0", () => 0);
         policy.AddBuiltin("custom.builtin1", (int i) => 0);
         policy.AddBuiltin("custom.builtin2", (int i, int j) => 0);
@@ -32,7 +32,7 @@ public class DefaultEntrypointShould : OpaPolicyTestBase
     [InlineData(Runtime.Wasmer)]
     public void ThrowWhenSettingUnknownEntrypoint(Runtime runtime)
     {
-        var policy = ExamplePolicy(runtime);
+        using var policy = ExamplePolicy(runtime);
         var unexpected = "something-crazy";
 
         Action act = () => policy.DefaultEntrypoint = unexpected;
