@@ -1,3 +1,7 @@
+using System.Text.Json;
+using CShopa.Extensions;
+using CShopa.Serialization;
+
 namespace CShopa;
 
 public interface IOpaRuntime : IDisposable
@@ -31,4 +35,58 @@ public interface IOpaRuntime : IDisposable
     /// <param name="json">The json to put into the shared memory.</param>
     /// <returns>The address where the value was written.</returns>
     int WriteValue(string json);
+
+    void ReleaseMemory(params int[] addresses) =>
+        addresses.ForEach(address => Invoke(WellKnown.Export.opa_free, address));
+
+    void ResetHeapTo(int address) =>
+        Invoke(WellKnown.Export.opa_heap_ptr_set, address);
+
+    int GetCurrentHeap() =>
+        Invoke<int>(WellKnown.Export.opa_heap_ptr_get);
+
+    int WriteJson(string json)
+    {
+        var address = WriteValue(json);
+
+        var resultAddress = Invoke<int>(WellKnown.Export.opa_json_parse, address, json.Length);
+
+        ReleaseMemory(address);
+
+        return resultAddress != 0 ? resultAddress : throw new ArgumentException("OPA failed to parse the input json.", nameof(json));
+    }
+
+    string ReadJson(int address)
+    {
+        var jsonAddress = Invoke<int>(WellKnown.Export.opa_json_dump, address);
+        var result = ReadValueAt(jsonAddress);
+
+        ReleaseMemory(jsonAddress);
+
+        return result;
+    }
+
+    string ReadJson(string function)
+    {
+        var address = Invoke<int>(function);
+        var json = ReadJson(address);
+        ReleaseMemory(address);
+        return json;
+    }
+
+    IDictionary<string, int> GetBuiltins()
+    {
+        var json = ReadJson(WellKnown.Export.builtins);
+        var builtins = JsonSerializer.Deserialize<Dictionary<string, int>>(json, OpaSerializerOptions.Default) ?? new();
+
+        return builtins.WithCaseInsensitiveKeys();
+    }
+
+    IDictionary<string, int> GetEntrypoints()
+    {
+        var json = ReadJson(WellKnown.Export.entrypoints);
+        var entrypoints = JsonSerializer.Deserialize<Dictionary<string, int>>(json, OpaSerializerOptions.Default) ?? new();
+
+        return entrypoints.WithCaseInsensitiveKeys();
+    }
 }
