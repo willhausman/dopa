@@ -8,7 +8,7 @@ namespace CShopa.Tests.BuiltinTests;
 
 public class InvokeShould
 {
-    private static readonly IOpaSerializer serializer = new DefaultSerializer();
+    private static readonly IOpaSerializer serializer = new OpaSerializer();
 
     [Fact]
     public void GetAndReturnArgsFromRuntime()

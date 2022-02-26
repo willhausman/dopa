@@ -2,16 +2,16 @@ using System.Text.Json;
 
 namespace CShopa.Serialization;
 
-public class DefaultSerializer : IOpaSerializer
+public class OpaSerializer : IOpaSerializer
 {
     private readonly JsonSerializerOptions options;
 
-    public DefaultSerializer()
+    public OpaSerializer()
     {
         this.options = OpaSerializerOptions.Default;
     }
 
-    public DefaultSerializer(JsonSerializerOptions options)
+    public OpaSerializer(JsonSerializerOptions options)
     {
         this.options = options;
     }

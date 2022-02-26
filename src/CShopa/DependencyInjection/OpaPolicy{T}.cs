@@ -1,6 +1,14 @@
-namespace CShopa.DependencyInjection;
+namespace CShopa;
 
-internal class OpaPolicy<TConsumer> : IOpaPolicy<TConsumer>
+/// <summary>
+/// An <see cref="IOpaPolicy" /> for a specific module.
+/// </summary>
+/// <typeparam name="TModuleName">The name of the module which created the policy.</typeparam>
+public interface IOpaPolicy<TModuleName> : IOpaPolicy
+{
+}
+
+internal class OpaPolicy<TModuleName> : IOpaPolicy<TModuleName>
 {
     private readonly IOpaPolicy policy;
 

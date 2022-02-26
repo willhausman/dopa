@@ -189,11 +189,3 @@ public interface IOpaPolicy : IDisposable
     /// <returns>True if added, otherwise false.</returns>
     bool AddBuiltin<TArg1, TArg2, TArg3, TArg4, TResult>(string name, Func<TArg1, TArg2, TArg3, TArg4, TResult> callback);
 }
-
-/// <summary>
-/// An <see cref="IOpaPolicy" /> for a specific consumer.
-/// </summary>
-/// <typeparam name="TConsumer">The intended consumer for the policy.</typeparam>
-public interface IOpaPolicy<TConsumer> : IOpaPolicy
-{
-}

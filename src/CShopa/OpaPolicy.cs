@@ -1,7 +1,6 @@
 namespace CShopa;
 
 using CShopa.Builtins;
-using CShopa.Extensions;
 using Serialization;
 
 public sealed class OpaPolicy : Disposable, IOpaPolicy

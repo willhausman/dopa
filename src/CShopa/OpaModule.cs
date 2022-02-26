@@ -1,5 +1,4 @@
 ﻿using CShopa.Builtins;
-using CShopa.Extensions;
 using CShopa.Serialization;
 
 namespace CShopa;
@@ -7,7 +6,7 @@ namespace CShopa;
 public class OpaModule : Disposable, IOpaModule
 {
     private readonly IWasmModule module;
-    private readonly IOpaSerializer serializer = new DefaultSerializer();
+    private readonly IOpaSerializer serializer = new OpaSerializer();
 
     public OpaModule(IWasmModule module)
     {
@@ -18,6 +17,8 @@ public class OpaModule : Disposable, IOpaModule
 
         this.module = module;
     }
+
+    public string Name => module.Name;
 
     public IOpaPolicy CreatePolicy()
     {
