@@ -4,7 +4,7 @@ using CShopa.Serialization;
 
 namespace CShopa;
 
-public interface IOpaRuntime : IDisposable
+public interface IOpaRuntime : IOpaDisposable
 {
     /// <summary>
     /// Invokes an OPA function on the runtime.

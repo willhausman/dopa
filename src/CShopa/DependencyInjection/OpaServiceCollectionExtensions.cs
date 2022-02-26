@@ -1,5 +1,6 @@
 using CShopa.Runtime;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CShopa.DependencyInjection;
 
@@ -8,42 +9,69 @@ public static class OpaServiceCollectionExtensions
     public static IServiceCollection AddOpaPolicy(this IServiceCollection services, string wasmFilePath)
     {
         var module = WasmModule.FromFile(wasmFilePath);
-        services.AddTransient<IOpaPolicy>(_ => module.CreatePolicy());
+        services.AddSingleton<IOpaModule>(_ => module);
+        services.TryAddTransient<IOpaModuleCollection, OpaModuleCollection>();
+
+        services.AddTransient<IOpaPolicy>(provider =>
+            provider.GetRequiredService<IOpaModuleCollection>()[wasmFilePath].CreatePolicy());
         return services;
     }
 
-    public static IServiceCollection AddOpaPolicy(this IServiceCollection services, byte[] wasmContent)
+    public static IServiceCollection AddOpaPolicy(this IServiceCollection services, string name, byte[] wasmContent)
     {
-        var module = WasmModule.FromBytes("WasmModule", wasmContent);
-        services.AddTransient<IOpaPolicy>(_ => module.CreatePolicy());
+        var module = WasmModule.FromBytes(name, wasmContent);
+        services.AddSingleton<IOpaModule>(_ => module);
+        services.TryAddTransient<IOpaModuleCollection, OpaModuleCollection>();
+
+        services.AddTransient<IOpaPolicy>(provider =>
+            provider.GetRequiredService<IOpaModuleCollection>()[name].CreatePolicy());
         return services;
     }
 
-    public static IServiceCollection AddOpaPolicy(this IServiceCollection services, Stream stream)
+    public static IServiceCollection AddOpaPolicy(this IServiceCollection services, string name, Stream stream)
     {
-        var module = WasmModule.FromStream("WasmModule", stream);
-        services.AddTransient<IOpaPolicy>(_ => module.CreatePolicy());
+        var module = WasmModule.FromStream(name, stream);
+        services.AddSingleton<IOpaModule>(_ => module);
+        services.TryAddTransient<IOpaModuleCollection, OpaModuleCollection>();
+
+        services.AddTransient<IOpaPolicy>(provider =>
+            provider.GetRequiredService<IOpaModuleCollection>()[name].CreatePolicy());
         return services;
     }
 
-    public static IServiceCollection AddOpaPolicy<TConsumer>(this IServiceCollection services, string wasmFilePath)
+    public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, string wasmFilePath)
     {
-        var module = WasmModule.FromFile(wasmFilePath);
-        services.AddTransient<IOpaPolicy<TConsumer>>(_ => new OpaPolicy<TConsumer>(module.CreatePolicy()));
+        var name = nameof(TModuleName);
+        var module = WasmModule.FromFile(name, wasmFilePath);
+        services.AddSingleton<IOpaModule>(_ => module);
+        services.TryAddTransient<IOpaModuleCollection, OpaModuleCollection>();
+
+        services.AddTransient<IOpaPolicy<TModuleName>>(provider =>
+            new OpaPolicy<TModuleName>(provider.GetRequiredService<IOpaModuleCollection>()[name].CreatePolicy()));
         return services;
     }
 
-    public static IServiceCollection AddOpaPolicy<TConsumer>(this IServiceCollection services, byte[] wasmContent)
+    public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, byte[] wasmContent)
     {
-        var module = WasmModule.FromBytes(nameof(TConsumer), wasmContent);
-        services.AddTransient<IOpaPolicy<TConsumer>>(_ => new OpaPolicy<TConsumer>(module.CreatePolicy()));
+        var name = nameof(TModuleName);
+        var module = WasmModule.FromBytes(name, wasmContent);
+        services.AddSingleton<IOpaModule>(_ => module);
+        services.TryAddTransient<IOpaModuleCollection, OpaModuleCollection>();
+
+        services.AddTransient<IOpaPolicy<TModuleName>>(provider =>
+            new OpaPolicy<TModuleName>(provider.GetRequiredService<IOpaModuleCollection>()[name].CreatePolicy()));
         return services;
     }
 
-    public static IServiceCollection AddOpaPolicy<TConsumer>(this IServiceCollection services, Stream stream)
+    public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, Stream stream)
     {
-        var module = WasmModule.FromStream(nameof(TConsumer), stream);
-        services.AddTransient<IOpaPolicy<TConsumer>>(_ => new OpaPolicy<TConsumer>(module.CreatePolicy()));
+        var name = nameof(TModuleName);
+        var module = WasmModule.FromStream(name, stream);
+        services.AddSingleton<IOpaModule>(_ => module);
+        services.TryAddTransient<IOpaModuleCollection, OpaModuleCollection>();
+
+        services.AddTransient<IOpaPolicy<TModuleName>>(provider =>
+            new OpaPolicy<TModuleName>(provider.GetRequiredService<IOpaModuleCollection>()[name].CreatePolicy()));
         return services;
     }
 }

@@ -1,8 +1,13 @@
 namespace CShopa;
 
-public abstract class Disposable : IDisposable
+public interface IOpaDisposable : IDisposable
 {
-    private bool disposedValue;
+    bool Disposed { get; }
+}
+
+public abstract class Disposable : IOpaDisposable
+{
+    public bool Disposed { get; private set; }
 
     protected virtual void DisposeManaged() { }
 
@@ -13,7 +18,7 @@ public abstract class Disposable : IDisposable
 
     protected void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!Disposed)
         {
             if (disposing)
             {
@@ -22,7 +27,7 @@ public abstract class Disposable : IDisposable
 
             DisposeUnmanaged();
 
-            disposedValue = true;
+            Disposed = true;
         }
     }
 

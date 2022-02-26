@@ -1,6 +1,6 @@
 namespace CShopa;
 
-public interface IWasmModule : IDisposable
+public interface IWasmModule : IOpaDisposable
 {
     string Name { get; }
 

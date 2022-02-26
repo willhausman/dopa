@@ -25,6 +25,8 @@ internal class OpaPolicy<TModuleName> : IOpaPolicy<TModuleName>
 
     public string DefaultEntrypoint { get => policy.DefaultEntrypoint; set => policy.DefaultEntrypoint = value; }
 
+    public bool Disposed => policy.Disposed;
+
     public bool AddBuiltin<TResult>(string name, Func<TResult> callback) =>
         policy.AddBuiltin(name, callback);
 

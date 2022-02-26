@@ -3,7 +3,7 @@
 /// <summary>
 /// An instance of an OPA policy which can be evaluated.
 /// </summary>
-public interface IOpaPolicy : IDisposable
+public interface IOpaPolicy : IOpaDisposable
 {
     /// <summary>
     /// A representation of the data loaded into the policy.
