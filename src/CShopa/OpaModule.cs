@@ -6,7 +6,6 @@ namespace CShopa;
 public class OpaModule : Disposable, IOpaModule
 {
     private readonly IWasmModule module;
-    private readonly IOpaSerializer serializer = new OpaSerializer();
 
     public OpaModule(IWasmModule module)
     {
@@ -20,6 +19,8 @@ public class OpaModule : Disposable, IOpaModule
 
     public string Name => module.Name;
 
+    public IOpaSerializer Serializer { get; set; } = new OpaSerializer();
+
     public IOpaPolicy CreatePolicy()
     {
         var builtins = new BuiltinCollection();
@@ -29,7 +30,7 @@ public class OpaModule : Disposable, IOpaModule
 
         // this.builtins.ForEach(b => collection.AddBuiltin(b));
 
-        var policy = new OpaPolicy(runtime, serializer, builtins, entrypoints);
+        var policy = new OpaPolicy(runtime, Serializer, builtins, entrypoints);
 
         return policy;
     }
