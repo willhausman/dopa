@@ -25,7 +25,7 @@ public class AddBuiltinShould : OpaPolicyTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
-    [InlineData(Runtime.Wasmer)]
+    // [InlineData(Runtime.Wasmer)]
     public void CallAddedBuiltins(Runtime runtime)
     {
         using var policy = BuiltinsPolicy(runtime);
