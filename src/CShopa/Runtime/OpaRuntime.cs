@@ -35,7 +35,7 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
     {
         var run = instance.GetFunction(store, function);
 
-        if (run is Function)
+        if (run is not null)
         {
             run.Invoke(store, rest);
         }
@@ -49,7 +49,7 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
     {
         var run = instance.GetFunction(store, function);
 
-        if (run is Function)
+        if (run is not null)
         {
             return (T?)run.Invoke(store, rest);
         }

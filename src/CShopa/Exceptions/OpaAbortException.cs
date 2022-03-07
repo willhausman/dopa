@@ -7,5 +7,5 @@ public class OpaAbortException : Exception
     {
     }
 
-    public static OpaAbortException Because(string info) => new OpaAbortException($"OPA has aported with the message: {info}");
+    public static OpaAbortException Because(string info) => new OpaAbortException($"OPA has aborted with the message: {info}");
 }

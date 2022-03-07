@@ -61,18 +61,15 @@ public static class OpaServiceCollectionExtensions
     {
         var builder = new OpaBuilder(factory);
 
-        if (options is not null)
-        {
-            options(builder);
-        }
+        options?.Invoke(builder);
 
         if (builder.EagerLoad)
         {
-            var module = builder.Module.Value;
+            var _ = builder.Module.Value;
         }
 
         services
-            .AddSingleton<IOpaModule>(_ => builder.Module.Value)
+            .AddSingleton(_ => builder.Module.Value)
             .TryAddTransient<IOpaModuleCollection, OpaModuleCollection>()
             ;
 
@@ -81,7 +78,7 @@ public static class OpaServiceCollectionExtensions
 
     private static IServiceCollection AddTransientOpaPolicy(this IServiceCollection services, string name)
     {
-        return services.AddTransient<IOpaPolicy>(provider =>
+        return services.AddTransient(provider =>
             provider.GetRequiredService<IOpaModuleCollection>()[name].CreatePolicy());
     }
 

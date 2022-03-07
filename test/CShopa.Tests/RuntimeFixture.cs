@@ -4,7 +4,7 @@ namespace CShopa.Tests;
 
 public class RuntimeFixture : Disposable
 {
-    private Dictionary<Runtime, IRuntimeFixture> fixtures = new()
+    private readonly Dictionary<Runtime, IRuntimeFixture> fixtures = new()
     {
         { Runtime.Wasmtime, new WasmtimeFixture() },
         { Runtime.Wasmer, new WasmerFixture() },

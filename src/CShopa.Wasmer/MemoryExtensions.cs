@@ -19,5 +19,5 @@ public static class MemoryExtensions
     public static void WriteString(this Memory memory, int address, string value) =>
         Encoding.UTF8.GetBytes(value, memory.GetSpan().Slice(address));
 
-    private unsafe static Span<byte> GetSpan(this Memory memory) => new((byte*)memory.Data, (int)memory.DataLength);
+    private static unsafe Span<byte> GetSpan(this Memory memory) => new((byte*)memory.Data, (int)memory.DataLength);
 }
