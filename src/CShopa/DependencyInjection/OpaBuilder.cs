@@ -16,7 +16,7 @@ internal class OpaBuilder : IOpaBuilder
 
     public bool EagerLoad { get; private set; } = true;
 
-    public Lazy<IOpaModule> Module { get; private set; }
+    public Lazy<IOpaModule> Module { get; }
 
     public IOpaBuilder LazyLoadModule()
     {

@@ -23,7 +23,7 @@ public class EntrypointCollection : IEntrypointCollection
 
     public string DefaultEntrypoint
     {
-        get { return defaultEntrypoint; }
+        get => defaultEntrypoint;
         set
         {
             if (!entrypoints.ContainsKey(value))

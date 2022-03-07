@@ -11,5 +11,5 @@ public static class OpaSerializerOptions
             PropertyNameCaseInsensitive = true,
         });
     
-    public static JsonSerializerOptions Default = @default.Value;
+    public static JsonSerializerOptions Default => @default.Value;
 }

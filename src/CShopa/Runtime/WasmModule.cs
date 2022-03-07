@@ -7,7 +7,7 @@ public class WasmModule : Disposable, IWasmModule
     private readonly Engine engine;
     private readonly Module module;
 
-    public WasmModule(Engine engine, Module module, string name)
+    private WasmModule(Engine engine, Module module, string name)
     {
         this.engine = engine;
         this.module = module;

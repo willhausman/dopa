@@ -4,8 +4,8 @@ namespace CShopa.Builtins;
 
 public abstract class Builtin : IBuiltin
 {
-    protected readonly IOpaRuntime runtime;
-    protected readonly IOpaSerializer serializer;
+    private readonly IOpaRuntime runtime;
+    private readonly IOpaSerializer serializer;
 
     public Builtin(string name, IOpaRuntime runtime, IOpaSerializer serializer)
     {
@@ -34,7 +34,7 @@ public abstract class Builtin : IBuiltin
         serializer.Deserialize<T>(runtime.ReadJson(address));
 
     protected int Return<T>(T value) =>
-        runtime.WriteJson(serializer.Serialize<T>(value));
+        runtime.WriteJson(serializer.Serialize(value));
 }
 
 public sealed class Builtin<TResult> : Builtin

@@ -8,7 +8,7 @@ namespace CShopa.Tests.BuiltinTests;
 
 public class InvokeShould
 {
-    private static readonly IOpaSerializer serializer = new OpaSerializer();
+    private static readonly IOpaSerializer Serializer = new OpaSerializer();
 
     [Fact]
     public void GetAndReturnArgsFromRuntime()
@@ -18,11 +18,11 @@ public class InvokeShould
         runtime.Setup(r => r.WriteJson(It.IsAny<string>())).Returns<string>(x => int.Parse(x));
         var builtins = new IBuiltin[]
         {
-            new Builtin<int>("increment", runtime.Object, serializer, () => 1),
-            new Builtin<int, int>("increment", runtime.Object, serializer, (int x) => x + 1),
-            new Builtin<int, int, int>("increment", runtime.Object, serializer, (int x, int y) => x + y + 1),
-            new Builtin<int, int, int, int>("increment", runtime.Object, serializer, (int x, int y, int z) => x + y + z + 1),
-            new Builtin<int, int, int, int, int>("increment", runtime.Object, serializer, (int x, int y, int z, int a) => x + y + z + a + 1),
+            new Builtin<int>("increment", runtime.Object, Serializer, () => 1),
+            new Builtin<int, int>("increment", runtime.Object, Serializer, (int x) => x + 1),
+            new Builtin<int, int, int>("increment", runtime.Object, Serializer, (int x, int y) => x + y + 1),
+            new Builtin<int, int, int, int>("increment", runtime.Object, Serializer, (int x, int y, int z) => x + y + z + 1),
+            new Builtin<int, int, int, int, int>("increment", runtime.Object, Serializer, (int x, int y, int z, int a) => x + y + z + a + 1),
         };
         
         for (var i = 0; i < builtins.Length; i++)
@@ -40,11 +40,11 @@ public class InvokeShould
         runtime.Setup(r => r.WriteJson(It.IsAny<string>())).Returns<string>(x => int.Parse(x));
         var builtins = new IBuiltin[]
         {
-            new Builtin<int>("increment", runtime.Object, serializer, () => 1),
-            new Builtin<int, int>("increment", runtime.Object, serializer, (int x) => x + 1),
-            new Builtin<int, int, int>("increment", runtime.Object, serializer, (int x, int y) => x + y + 1),
-            new Builtin<int, int, int, int>("increment", runtime.Object, serializer, (int x, int y, int z) => x + y + z + 1),
-            new Builtin<int, int, int, int, int>("increment", runtime.Object, serializer, (int x, int y, int z, int a) => x + y + z + a + 1),
+            new Builtin<int>("increment", runtime.Object, Serializer, () => 1),
+            new Builtin<int, int>("increment", runtime.Object, Serializer, (int x) => x + 1),
+            new Builtin<int, int, int>("increment", runtime.Object, Serializer, (int x, int y) => x + y + 1),
+            new Builtin<int, int, int, int>("increment", runtime.Object, Serializer, (int x, int y, int z) => x + y + z + 1),
+            new Builtin<int, int, int, int, int>("increment", runtime.Object, Serializer, (int x, int y, int z, int a) => x + y + z + a + 1),
         };
 
         for (var i = 0; i < builtins.Length; i++)

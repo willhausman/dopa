@@ -5,8 +5,8 @@ namespace CShopa.Wasmer;
 internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {
     private const double PageSize = 65536; // bytes size of a WebAssembly memory page
-    private Memory memory;
-    private Instance instance;
+    private readonly Memory memory;
+    private readonly Instance instance;
 
     public OpaRuntime(Memory memory, Instance instance)
     {

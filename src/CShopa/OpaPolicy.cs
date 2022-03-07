@@ -5,15 +5,15 @@ using Serialization;
 
 public sealed class OpaPolicy : Disposable, IOpaPolicy
 {
-    private const string emptyInput = "";
-    private const string emptyJson = "\"\"";
+    private const string EmptyInput = "";
+    private const string EmptyJson = "\"\"";
     private readonly IOpaRuntime runtime;
     private readonly IOpaSerializer serializer;
     private readonly IBuiltinCollection builtins;
     private readonly IEntrypointCollection entrypoints;
 
     // the pointers and addresses returned from the OPA assembly are int32.
-    private int initialHeapPointer;
+    private readonly int initialHeapPointer;
     private int executionHeapPointer;
     private int dataAddress;
 
@@ -31,25 +31,25 @@ public sealed class OpaPolicy : Disposable, IOpaPolicy
 
     public string DefaultEntrypoint
     {
-        get { return entrypoints.DefaultEntrypoint; }
-        set { entrypoints.DefaultEntrypoint = value; }
+        get => entrypoints.DefaultEntrypoint;
+        set => entrypoints.DefaultEntrypoint = value;
     }
 
     public object? Data { get; private set; }
 
     public string? DataJson { get; private set; }
 
-    public T? Evaluate<T>() => EvaluateAt<T>(DefaultEntrypoint, emptyInput, out var _);
+    public T? Evaluate<T>() => EvaluateAt<T>(DefaultEntrypoint, EmptyInput, out var _);
 
-    public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, emptyInput, out responseJson);
+    public T? Evaluate<T>(out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, EmptyInput, out responseJson);
 
     public T? Evaluate<T>(object input) => EvaluateAt<T>(DefaultEntrypoint, input, out var _);
 
     public T? Evaluate<T>(object input, out string responseJson) => EvaluateAt<T>(DefaultEntrypoint, input, out responseJson);
 
-    public T? EvaluateAt<T>(string entrypoint) => EvaluateAt<T>(entrypoint, emptyInput, out var _);
+    public T? EvaluateAt<T>(string entrypoint) => EvaluateAt<T>(entrypoint, EmptyInput, out var _);
 
-    public T? EvaluateAt<T>(string entrypoint, out string responseJson) => EvaluateAt<T>(entrypoint, emptyInput, out responseJson);
+    public T? EvaluateAt<T>(string entrypoint, out string responseJson) => EvaluateAt<T>(entrypoint, EmptyInput, out responseJson);
 
     public T? EvaluateAt<T>(string entrypoint, object input) => EvaluateAt<T>(entrypoint, input, out var _);
 
@@ -60,11 +60,11 @@ public sealed class OpaPolicy : Disposable, IOpaPolicy
         return response is not null ? response.FirstOrDefault() : default;
     }
 
-    public string EvaluateJson() => EvaluateJsonAt(DefaultEntrypoint, emptyJson);
+    public string EvaluateJson() => EvaluateJsonAt(DefaultEntrypoint, EmptyJson);
 
     public string EvaluateJson(string json) => EvaluateJsonAt(DefaultEntrypoint, json);
 
-    public string EvaluateJsonAt(string entrypoint) => EvaluateJsonAt(entrypoint, emptyJson);
+    public string EvaluateJsonAt(string entrypoint) => EvaluateJsonAt(entrypoint, EmptyJson);
 
     public string EvaluateJsonAt(string entrypoint, string json)
     {
