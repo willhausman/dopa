@@ -36,13 +36,8 @@ public class EntrypointCollection : IEntrypointCollection
         }
     }
 
-    public int this[string entrypoint]
-    {
-        get
-        {
-            var entrypointId = defaultEntrypointId;
-            entrypoints.TryGetValue(entrypoint, out entrypointId);
-            return entrypointId;
-        }
-    }
+    public int this[string entrypoint] =>
+        entrypoints.TryGetValue(entrypoint, out var entrypointId) 
+            ? entrypointId 
+            : defaultEntrypointId;
 }
