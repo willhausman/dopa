@@ -13,12 +13,11 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
     [NotNull]
     private Memory? memory;
 
-    public OpaRuntime(Store store, Memory memory, Linker linker, Module module)
+    public OpaRuntime(Store store, Memory memory, Instance instance)
     {
         this.store = store;
         this.memory = memory;
-
-        instance = linker.Instantiate(store, module);
+        this.instance = instance;
     }
 
     public string ReadValueAt(int address) =>

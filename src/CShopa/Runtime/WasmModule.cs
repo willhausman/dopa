@@ -26,8 +26,9 @@ public class WasmModule : Disposable, IWasmModule
         var memory = new Memory(store, WellKnown.Requirements.MinimumMemorySize);
         
         linker.LinkForOpa(store, memory, collection);
+        var instance = linker.Instantiate(store, module);
 
-        return new OpaRuntime(store, memory, linker, module);
+        return new OpaRuntime(store, memory, instance);
     }
 
     public static IOpaModule FromFile(string filePath) => FromFile(filePath, filePath);
