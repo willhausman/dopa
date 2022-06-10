@@ -1,8 +1,8 @@
-# CShopa
+# DOPA
 
-A C# [OPA](https://www.openpolicyagent.org) client designed for applications to take advantage of its first-class [WebAssembly](https://webassembly.org) support.
+A dotnet [OPA](https://www.openpolicyagent.org) client designed for applications to take advantage of its first-class [WebAssembly](https://webassembly.org) support.
 
-CShopa is built with [Wasmtime](https://github.com/bytecodealliance/wasmtime), the same runtime used by OPA for WebAssembly.
+DOPA is built with [Wasmtime](https://github.com/bytecodealliance/wasmtime), the same runtime used by OPA for WebAssembly.
 
 ## Usage
 
@@ -18,7 +18,7 @@ $ tar -xzf ./bundle.tar.gz /policy.wasm
 With your compiled wasm available to your application, and named whatever you want, instantiate an `IOpaModule` from the file.
 
 ```csharp
-using CShopa;
+using DOPA;
 
 using IOpaModule module = WasmModule.FromFile("./example.wasm");
 ```
@@ -39,4 +39,4 @@ Pull requests and issues are appreciated and encouraged.
 
 ## License
 
-CShopa is licensed under the [MIT License](./LICENSE).
+DOPA is licensed under the [MIT License](./LICENSE).
