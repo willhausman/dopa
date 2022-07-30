@@ -1,9 +1,11 @@
-using DOPA.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DOPA.DependencyInjection;
 
+/// <summary>
+/// Convenience extension methods for using DOPA with Microsoft Dependency Injection.
+/// </summary>
 public static class OpaServiceCollectionExtensions
 {
     public static IServiceCollection AddOpaPolicy(this IServiceCollection services, string wasmFilePath, Action<IOpaBuilder>? options = null)

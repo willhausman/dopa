@@ -4,11 +4,37 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>DOPA</AssemblyName>
+    <PackageId>DOPA</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Will Hausman</Authors>
+    <Owners>Will Hausman</Owners>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <RepositoryUrl>https://github.com/willhausman/dopa</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <Description>A .NET API for evaluating OPA policies compiled as WebAssembly modules.</Description>
+    <PackageTags>webassembly, .net, wasm, opa, open-policy-agent</PackageTags>
+    <Title>DOPA</Title>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Wasmtime" Version="0.36.0-preview1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
   </ItemGroup>
 
 </Project>
