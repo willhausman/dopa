@@ -1,14 +1,20 @@
 namespace DOPA;
 
+/// <inheritdoc />
 public class OpaModuleCollection : IOpaModuleCollection
 {
     private readonly IDictionary<string, IOpaModule> modules;
 
+    /// <summary>
+    /// Initializes the class.
+    /// </summary>
+    /// <param name="modules">An enumerable of loaded modules.</param>
     public OpaModuleCollection(IEnumerable<IOpaModule> modules)
     {
         this.modules = modules.ToDictionary(m => m.Name, StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <inheritdoc />
     public IOpaModule this[string name]
     {
         get
@@ -22,6 +28,7 @@ public class OpaModuleCollection : IOpaModuleCollection
         }
     }
 
+    /// <inheritdoc />
     public IReadOnlyCollection<IOpaModule> Modules
         => modules.Values.ToList();
 }

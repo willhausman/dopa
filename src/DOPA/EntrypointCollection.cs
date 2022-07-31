@@ -1,5 +1,6 @@
 namespace DOPA;
 
+/// <inheritdoc />
 public class EntrypointCollection : IEntrypointCollection
 {
     private int defaultEntrypointId = WellKnown.Values.DefaultEntrypointId;
@@ -7,6 +8,10 @@ public class EntrypointCollection : IEntrypointCollection
 
     private readonly IDictionary<string, int> entrypoints;
 
+    /// <summary>
+    /// Initializes the class.
+    /// </summary>
+    /// <param name="entrypoints">A map of names to entrypoint ids.</param>
     public EntrypointCollection(IDictionary<string, int> entrypoints)
     {
         this.entrypoints = entrypoints;
@@ -19,8 +24,10 @@ public class EntrypointCollection : IEntrypointCollection
         defaultEntrypoint = entrypoints.First(kvp => kvp.Value == defaultEntrypointId).Key;
     }
 
+    /// <inheritdoc/>
     public IReadOnlyCollection<string> Entrypoints => entrypoints.Keys.ToList();
 
+    /// <inheritdoc/>
     public string DefaultEntrypoint
     {
         get => defaultEntrypoint;
@@ -36,6 +43,7 @@ public class EntrypointCollection : IEntrypointCollection
         }
     }
 
+    /// <inheritdoc/>
     public int this[string entrypoint] =>
         entrypoints.TryGetValue(entrypoint, out var entrypointId) 
             ? entrypointId 

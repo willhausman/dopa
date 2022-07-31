@@ -3,8 +3,19 @@ using Wasmtime;
 
 namespace DOPA.Runtime
 {
+    /// <summary>
+    /// Convenience extensions for configuring the Wasmtime <see cref="Linker" />.
+    /// </summary>
     public static class LinkerExtensions
     {
+        /// <summary>
+        /// Link necessary imports and builtins for working with OPA.
+        /// </summary>
+        /// <param name="linker">A <see cref="Linker"/> instance.</param>
+        /// <param name="store">A <see cref="Store" /> instance.</param>
+        /// <param name="memory">The shared <see cref="Memory" /> instance.</param>
+        /// <param name="builtins">The delegates to call when certain builtins are called.</param>
+        /// <returns></returns>
         public static Linker LinkForOpa(this Linker linker, Store store, Memory memory, IBuiltinCollection builtins) =>
             linker
                 .DefineGlobalImports(store, memory)

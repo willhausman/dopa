@@ -8,6 +8,13 @@ namespace DOPA.DependencyInjection;
 /// </summary>
 public static class OpaServiceCollectionExtensions
 {
+    /// <summary>
+    /// Register <see cref="IOpaPolicy" /> and configure it.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="wasmFilePath">File path to the compiled .wasm file.</param>
+    /// <param name="options">Optional action to configure policies.</param>
+    /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy(this IServiceCollection services, string wasmFilePath, Action<IOpaBuilder>? options = null)
     {
         services
@@ -16,6 +23,14 @@ public static class OpaServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Register <see cref="IOpaPolicy" /> and configure it.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="name">A name for the policy.</param>
+    /// <param name="wasmContent">Contents of the compiled .wasm file.</param>
+    /// <param name="options">Optional action to configure policies.</param>
+    /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy(this IServiceCollection services, string name, byte[] wasmContent, Action<IOpaBuilder>? options = null)
     {
         services
@@ -24,6 +39,14 @@ public static class OpaServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Register <see cref="IOpaPolicy" /> and configure it.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="name">A name for the policy.</param>
+    /// <param name="stream">A <see cref="Stream" /> with the .wasm contents.</param>
+    /// <param name="options">Optional action to configure policies.</param>
+    /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy(this IServiceCollection services, string name, Stream stream, Action<IOpaBuilder>? options = null)
     {
         services
@@ -32,6 +55,14 @@ public static class OpaServiceCollectionExtensions
         return services;
     }
 
+
+    /// <summary>
+    /// Register <see cref="IOpaPolicy" /> and configure it.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="wasmFilePath">File path to the compiled .wasm file.</param>
+    /// <param name="options">Optional action to configure policies.</param>
+    /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, string wasmFilePath, Action<IOpaBuilder>? options = null)
     {
         var name = nameof(TModuleName);
@@ -41,6 +72,13 @@ public static class OpaServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Register <see cref="IOpaPolicy" /> and configure it.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="wasmContent">Contents of the compiled .wasm file.</param>
+    /// <param name="options">Optional action to configure policies.</param>
+    /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, byte[] wasmContent, Action<IOpaBuilder>? options = null)
     {
         var name = nameof(TModuleName);
@@ -50,6 +88,13 @@ public static class OpaServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Register <see cref="IOpaPolicy" /> and configure it.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="stream">A <see cref="Stream" /> with the .wasm contents.</param>
+    /// <param name="options">Optional action to configure policies.</param>
+    /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, Stream stream, Action<IOpaBuilder>? options = null)
     {
         var name = nameof(TModuleName);

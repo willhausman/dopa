@@ -3,10 +3,15 @@ using DOPA.Serialization;
 
 namespace DOPA;
 
+/// <inheritdoc />
 public class OpaModule : Disposable, IOpaModule
 {
     private readonly IWasmModule module;
 
+    /// <summary>
+    /// Initializes the class.
+    /// </summary>
+    /// <param name="module">The WebAssembly module used to instantiate policies.</param>
     public OpaModule(IWasmModule module)
     {
         if (!module.Exports.Contains(WellKnown.Export.opa_eval))
@@ -17,10 +22,13 @@ public class OpaModule : Disposable, IOpaModule
         this.module = module;
     }
 
+    /// <inheritdoc/>
     public string Name => module.Name;
 
+    /// <inheritdoc/>
     public IOpaSerializer Serializer { get; set; } = new OpaSerializer();
 
+    /// <inheritdoc/>
     public IOpaPolicy CreatePolicy()
     {
         var builtins = new BuiltinCollection();
@@ -35,6 +43,7 @@ public class OpaModule : Disposable, IOpaModule
         return policy;
     }
 
+    /// <inheritdoc/>
     protected override void DisposeManaged()
     {
         this.module.Dispose();

@@ -3,6 +3,9 @@ using Wasmtime;
 
 namespace DOPA.Runtime;
 
+/// <summary>
+/// An <see cref="IOpaRuntime" /> using Wasmtime.
+/// </summary>
 internal sealed class OpaRuntime : Disposable, IOpaRuntime
 {
     private readonly Store store;

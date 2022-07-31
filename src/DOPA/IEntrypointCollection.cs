@@ -1,5 +1,8 @@
 namespace DOPA;
 
+/// <summary>
+/// A collection of entrypoints to a wasm module.
+/// </summary>
 public interface IEntrypointCollection
 {
     /// <summary>

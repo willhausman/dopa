@@ -12,6 +12,7 @@
     <AssemblyName>DOPA</AssemblyName>
     <PackageId>DOPA</PackageId>
     <Version>1.0.0</Version>
+    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
     <Authors>Will Hausman</Authors>
     <Owners>Will Hausman</Owners>
     <IncludeSymbols>true</IncludeSymbols>
@@ -19,7 +20,6 @@
     <RepositoryUrl>https://github.com/willhausman/dopa</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
     <Description>A .NET API for evaluating OPA policies compiled as WebAssembly modules.</Description>
     <PackageTags>webassembly, .net, wasm, opa, open-policy-agent</PackageTags>
     <Title>DOPA</Title>

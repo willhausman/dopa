@@ -20,4 +20,43 @@ public class AddOpaPolicyShould
 
         module.Disposed.Should().BeTrue();
     }
+
+    [Fact]
+    public void ReturnAUsableInstanceFromAFile()
+    {
+        using var provider = new ServiceCollection()
+            .AddOpaPolicy("policies/example.wasm")
+            .BuildServiceProvider();
+        
+        using var policy = provider.GetRequiredService<IOpaPolicy>();
+    }
+
+    [Fact]
+    public void ReturnAUsableInstanceFromBytes()
+    {
+        var contents = File.ReadAllBytes("policies/example.wasm");
+        using var provider = new ServiceCollection()
+            .AddOpaPolicy("policy", contents)
+            .BuildServiceProvider();
+        
+        using var policy = provider.GetRequiredService<IOpaPolicy>();
+    }
+
+    [Fact]
+    public void ReturnAUsableInstanceFromStream()
+    {
+        var stream = File.OpenRead("policies/example.wasm");
+        using var provider = new ServiceCollection()
+            .AddOpaPolicy("policy", stream)
+            .BuildServiceProvider();
+        
+        using var policy = provider.GetRequiredService<IOpaPolicy>();
+    }
+
+    private void InstanceShouldBeUsable(IOpaPolicy policy)
+    {
+        policy.Should().NotBeNull();
+        policy.SetData(new { world = "hello" });
+        policy.Evaluate<bool>(new { message = "hello" }).Should().BeTrue();
+    }
 }
