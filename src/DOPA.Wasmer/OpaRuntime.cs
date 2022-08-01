@@ -24,12 +24,12 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         return address;
     }
 
-    public void Invoke(string function, params object[] rest)
+    public void Invoke(string function, params int[] rest)
     {
         var _ = instance.Call(function, rest) ?? throw new InvalidOperationException($"Could not invoke '{function}'.");
     }
 
-    public T? Invoke<T>(string function, params object[] rest)
+    public T? Invoke<T>(string function, params int[] rest)
     {
         var result = instance.Call(function, rest) ?? throw new InvalidOperationException($"Could not invoke '{function}'.");
         return (T?)result[0];

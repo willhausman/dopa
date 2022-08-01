@@ -33,13 +33,18 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         return address;
     }
 
-    public void Invoke(string function, params object[] rest)
+    public void Invoke(string function, params int[] rest)
     {
         var run = instance.GetFunction(store, function);
 
+        var @params = rest
+            .ToList()
+            .ConvertAll<ValueBox>(p => p)
+            .ToArray();
+
         if (run is not null)
         {
-            run.Invoke(store, rest);
+            run.Invoke(store, @params);
         }
         else
         {
@@ -47,13 +52,18 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
         }
     }
 
-    public T? Invoke<T>(string function, params object[] rest)
+    public T? Invoke<T>(string function, params int[] rest)
     {
         var run = instance.GetFunction(store, function);
 
+        var @params = rest
+            .ToList()
+            .ConvertAll<ValueBox>(p => p)
+            .ToArray();
+
         if (run is not null)
         {
-            return (T?)run.Invoke(store, rest);
+            return (T?)run.Invoke(store, @params);
         }
 
         throw new InvalidOperationException($"Could not invoke '{function}'");

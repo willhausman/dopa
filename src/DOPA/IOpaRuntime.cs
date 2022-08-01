@@ -16,14 +16,14 @@ public interface IOpaRuntime : IOpaDisposable
     /// <param name="rest">Any parameters needed for the function.</param>
     /// <typeparam name="T">The expected type to return.</typeparam>
     /// <returns>The result of executing the function.</returns>
-    T? Invoke<T>(string function, params object[] rest);
+    T? Invoke<T>(string function, params int[] rest);
 
     /// <summary>
     /// Invokes an OPA function on the runtime.
     /// </summary>
     /// <param name="function">The name of the function to run.</param>
     /// <param name="rest">Any parameters needed for the function.</param>
-    void Invoke(string function, params object[] rest);
+    void Invoke(string function, params int[] rest);
 
     /// <summary>
     /// Reads json from the shared memory buffer.
