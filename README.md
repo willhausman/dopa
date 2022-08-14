@@ -1,5 +1,14 @@
 # DOPA
 
+<div>
+    <a href="https://github.com/willhausman/dopa/actions/workflows/build.yml">
+        <img src="https://github.com/willhausman/dopa/actions/workflows/build.yml/badge.svg" alt="Build status"/>
+    </a>
+    <a href="https://www.nuget.org/packages/DOPA">
+        <img src="https://img.shields.io/nuget/v/DOPA" alt="Latest Version"/>
+    </a>
+</div>
+
 A dotnet [OPA](https://www.openpolicyagent.org) client designed for applications to take advantage of its first-class [WebAssembly](https://webassembly.org) support.
 
 DOPA is built with [Wasmtime](https://github.com/bytecodealliance/wasmtime), the same runtime used by OPA for WebAssembly.
