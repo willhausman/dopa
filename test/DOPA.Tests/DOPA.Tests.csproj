@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DOPA\DOPA.csproj" />
+    <ProjectReference Include="..\..\src\DOPA.Loader\DOPA.Loader.csproj" />
     <ProjectReference Include="..\..\src\DOPA.Wasmer\DOPA.Wasmer.csproj" />
   </ItemGroup>
 

@@ -5,45 +5,73 @@ namespace DOPA.Loader;
 /// <summary>
 /// Information needed to run the OPA CLI tool.
 /// </summary>
-public class OpaExecutable
+internal class OpaExecutable : IDisposable
 {
     private const string windowsFileName = "opa_windows_amd64.exe";
     private const string macFileName = "opa_darwin_amd64";
     private const string linuxFileName = "opa_linux_amd64";
 
-    private static readonly string fileName;
+    private static readonly string filePath;
+    private bool disposed;
+    private List<string> files = new();
 
     static OpaExecutable()
     {
-        fileName = OperatingSystem.IsWindows() ? windowsFileName :
+        var fileName = OperatingSystem.IsWindows() ? windowsFileName :
                    OperatingSystem.IsMacOS() ? macFileName :
                    OperatingSystem.IsLinux() ? linuxFileName :
                    throw new Exception("Unsupported OS detected.");
+
+        filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
     }
 
-    /// <summary>
-    /// Build an OPA bundle.
-    /// </summary>
-    /// <returns>The bundle.</returns>
-    public async Task<string> Build(string rego, params string[] entrypoints)
+    public async Task<string> Build(OpaArguments arguments)
     {
-        var outputFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{rego}.tar.gz");
+        var outputFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"opa-bundle-{DateTimeOffset.UtcNow.Ticks}.tar.gz");
 
         var baseArgs = new string[]
         {
             "build",
             "-t wasm",
             $"-o {outputFile}",
-            rego
         };
 
-        var args = baseArgs.Union(entrypoints.Select(e => $"-e {e}"));
+        var args = baseArgs
+            .Union(arguments.Entrypoints.Select(e => $"-e {e}"))
+            .Union(arguments.FilePaths)
+            ;
         var argString = string.Join(' ', args);
 
-        var p = Process.Start(fileName, argString);
+        var p = Process.Start(filePath, argString);
 
         await p.WaitForExitAsync();
 
+        files.Add(outputFile);
+
         return outputFile;
+    }
+
+    private void DisposeCore()
+    {
+        if (!disposed)
+        {
+            foreach (var file in files.Where(f => File.Exists(f)))
+            {
+                File.Delete(file);
+            }
+
+            disposed = true;
+        }
+    }
+
+    ~OpaExecutable()
+    {
+        DisposeCore();
+    }
+
+    public void Dispose()
+    {
+        DisposeCore();
+        GC.SuppressFinalize(this);
     }
 }
