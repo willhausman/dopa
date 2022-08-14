@@ -9,7 +9,7 @@
 
     <PropertyGroup>
         <OpaVersion>0.43.0</OpaVersion>
-        <Version>$(OpaVersion).0</Version>
+        <Version>$(OpaVersion)-b1</Version>
     </PropertyGroup>
 
     <Target Name="DownloadOpa" BeforeTargets="BeforeBuild">
