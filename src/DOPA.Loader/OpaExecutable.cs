@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Security.AccessControl;
 
 namespace DOPA.Loader;
 
@@ -23,6 +24,12 @@ internal class OpaExecutable : IDisposable
                    throw new Exception("Unsupported OS detected.");
 
         filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+
+        if (!OperatingSystem.IsWindows())
+        {
+            var p = Process.Start("chmod", $"755 {filePath}");
+            p.WaitForExit();
+        }
     }
 
     public async Task<string> Build(OpaArguments arguments)
