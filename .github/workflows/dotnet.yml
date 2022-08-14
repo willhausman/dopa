@@ -8,8 +8,12 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    name: Test DOPA
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      os: [macos-latest, windows-latest, ubuntu-latest]
+      config: [release] # [debug,release]
 
     steps:
     - uses: actions/checkout@v2
@@ -20,6 +24,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build -c ${{ matrix.config }} --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test -c ${{ matrix.config }} --no-build --verbosity normal
