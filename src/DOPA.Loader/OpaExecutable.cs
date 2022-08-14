@@ -36,6 +36,17 @@ internal class OpaExecutable : IDisposable
     {
         var outputFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"opa-bundle-{DateTimeOffset.UtcNow.Ticks}.tar.gz");
 
+        var p = Process.Start(filePath, MakeBuildArgs(outputFile, arguments));
+
+        await p.WaitForExitAsync();
+
+        files.Add(outputFile);
+
+        return outputFile;
+    }
+
+    private string MakeBuildArgs(string outputFile, OpaArguments arguments)
+    {
         var baseArgs = new string[]
         {
             "build",
@@ -47,15 +58,13 @@ internal class OpaExecutable : IDisposable
             .Union(arguments.Entrypoints.Select(e => $"-e {e}"))
             .Union(arguments.FilePaths)
             ;
-        var argString = string.Join(' ', args);
 
-        var p = Process.Start(filePath, argString);
+        if (!string.IsNullOrWhiteSpace(arguments.Capabilities))
+        {
+            args = args.Append($"--capabilities {arguments.Capabilities}");
+        }
 
-        await p.WaitForExitAsync();
-
-        files.Add(outputFile);
-
-        return outputFile;
+        return string.Join(' ', args);
     }
 
     private void DisposeCore()

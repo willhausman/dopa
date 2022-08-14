@@ -6,7 +6,7 @@ namespace DOPA.Loader;
 public record OpaArguments
 {
     /// <summary>
-    /// Initializes the record/
+    /// Initializes the record.
     /// </summary>
     /// <param name="filePaths">The paths to a rego or directory of regos.</param>
     /// <param name="entrypoints">The entrypoints to expose.</param>
@@ -27,6 +27,16 @@ public record OpaArguments
         {
             throw new ArgumentException("At least one entrypoint is required.", nameof(entrypoints));
         }
+    }
+
+    /// <summary>
+    /// Initializes the record.
+    /// </summary>
+    /// <param name="filePath">The path to a rego or directory of regos.</param>
+    /// <param name="entrypoints">The entrypoints to expose.</param>
+    public OpaArguments(string filePath, params string[] entrypoints)
+        : this(new[] { filePath }, entrypoints)
+    {
     }
     
     // TODO: Data.json files as well, I assume?
