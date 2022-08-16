@@ -7,7 +7,7 @@ public class WasmtimeFixture : Disposable, IRuntimeFixture
 {
     private readonly Lazy<IOpaModule> exampleModule = new Lazy<IOpaModule>(() =>
     {
-        using var stream = OpaLoader.CreateWebAssemblyStream("policies/example.rego", "example/hello").Result;
+        using var stream = OpaLoader.CreateWebAssemblyModule("policies/example.rego", "example/hello");
         return WasmModule.FromStream("example", stream);
     });
     public IOpaModule ExampleModule => exampleModule.Value;
@@ -18,7 +18,7 @@ public class WasmtimeFixture : Disposable, IRuntimeFixture
         {
             Capabilities = "policies/builtins.capabilities.json"
         };
-        using var stream = OpaLoader.CreateWebAssemblyStream(args).Result;
+        using var stream = OpaLoader.CreateWebAssemblyModule(args);
         return WasmModule.FromStream("builtins", stream);
     });
     public IOpaModule BuiltinsModule => builtinsModule.Value;

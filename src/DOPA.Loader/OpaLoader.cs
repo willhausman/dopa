@@ -14,27 +14,56 @@ public static class OpaLoader
     /// <param name="filePath">Path to the rego file.</param>
     /// <param name="entrypoints">At least one entrypoint.</param>
     /// <returns>A stream with the WebAssembly module.</returns>
-    public static Task<Stream> CreateWebAssemblyStream(string filePath, params string[] entrypoints) =>
-        CreateWebAssemblyStream(new OpaArguments(new[] { filePath }, entrypoints));
+    public static Task<Stream> CreateWebAssemblyModuleAsync(string filePath, params string[] entrypoints) =>
+        CreateWebAssemblyModuleAsync(new OpaArguments(new[] { filePath }, entrypoints));
 
     /// <summary>
     /// Creates a WebAssembly module.
     /// </summary>
     /// <param name="arguments">Arguments for OPA.</param>
     /// <returns>A stream with the WebAssembly module.</returns>
-    public static async Task<Stream> CreateWebAssemblyStream(OpaArguments arguments)
+    public static async Task<Stream> CreateWebAssemblyModuleAsync(OpaArguments arguments)
     {
 
         using var e = new OpaExecutable();
 
-        var opaBundle = await e.Build(arguments);
+        var opaBundlePath = await e.BuildAsync(arguments);
 
-        return CreateStream(opaBundle);
+        return ExtractWebAssemblyFromOpaBundle(opaBundlePath);
     }
 
-    private static Stream CreateStream(string wasmFilePath)
+    /// <summary>
+    /// Creates an OPA WebAssembly module from a rego file.
+    /// </summary>
+    /// <param name="filePath">Path to the rego file.</param>
+    /// <param name="entrypoints">At least one entrypoint.</param>
+    /// <returns>A stream with the WebAssembly module.</returns>
+    public static Stream CreateWebAssemblyModule(string filePath, params string[] entrypoints) =>
+        CreateWebAssemblyModule(new OpaArguments(new[] { filePath }, entrypoints));
+
+    /// <summary>
+    /// Creates a WebAssembly module.
+    /// </summary>
+    /// <param name="arguments">Arguments for OPA.</param>
+    /// <returns>A stream with the WebAssembly module.</returns>
+    public static Stream CreateWebAssemblyModule(OpaArguments arguments)
     {
-        using var fileStream = File.OpenRead(wasmFilePath);
+
+        using var e = new OpaExecutable();
+
+        var opaBundlePath = e.Build(arguments);
+
+        return ExtractWebAssemblyFromOpaBundle(opaBundlePath);
+    }
+
+    /// <summary>
+    /// Opens an OPA bundle and extracts the policy.wasm.
+    /// </summary>
+    /// <param name="opaBundlePath">Path to the bundle.tar.gz.</param>
+    /// <returns>A <see cref="Stream" /> with the wasm contents.</returns>
+    public static Stream ExtractWebAssemblyFromOpaBundle(string opaBundlePath)
+    {
+        using var fileStream = File.OpenRead(opaBundlePath);
         using var unzippedStream = new GZipInputStream(fileStream);
         using var tarStream = new TarInputStream(unzippedStream, System.Text.Encoding.UTF8);
 

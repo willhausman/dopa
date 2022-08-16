@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Security.AccessControl;
 
 namespace DOPA.Loader;
 
@@ -14,7 +13,7 @@ internal class OpaExecutable : IDisposable
 
     private static readonly string filePath;
     private bool disposed;
-    private List<string> files = new();
+    private List<string> createdFiles = new();
 
     static OpaExecutable()
     {
@@ -32,37 +31,41 @@ internal class OpaExecutable : IDisposable
         }
     }
 
-    public async Task<string> Build(OpaArguments arguments)
+    public async Task<string> BuildAsync(OpaArguments arguments)
     {
-        var outputFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"opa-bundle-{DateTimeOffset.UtcNow.Ticks}.tar.gz");
-
-        var p = Process.Start(filePath, MakeBuildArgs(outputFile, arguments));
-
+        var (p, bundleFilePath) = StartBuildProcess(arguments);
         await p.WaitForExitAsync();
-
-        files.Add(outputFile);
-
-        return outputFile;
+        return bundleFilePath;
     }
+
+    public string Build(OpaArguments arguments)
+    {
+        var (p, bundleFilePath) = StartBuildProcess(arguments);
+        p.WaitForExit();
+        return bundleFilePath;
+    }
+
+    private (Process opaProcess, string bundleFilePath) StartBuildProcess(OpaArguments arguments)
+    {
+        var bundleFilePath = GetNextBundlePath();
+
+        var p = Process.Start(filePath, MakeBuildArgs(bundleFilePath, arguments));
+
+        createdFiles.Add(bundleFilePath);
+
+        return (p, bundleFilePath);
+    }
+
+    private string GetNextBundlePath() => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"opa-bundle-{DateTimeOffset.UtcNow.Ticks}.tar.gz");
 
     private string MakeBuildArgs(string outputFile, OpaArguments arguments)
     {
-        var baseArgs = new string[]
+        var args = new string[]
         {
             "build",
             "-t wasm",
             $"-o {outputFile}",
-        };
-
-        var args = baseArgs
-            .Union(arguments.Entrypoints.Select(e => $"-e {e}"))
-            .Union(arguments.FilePaths)
-            ;
-
-        if (!string.IsNullOrWhiteSpace(arguments.Capabilities))
-        {
-            args = args.Append($"--capabilities {arguments.Capabilities}");
-        }
+        }.Union(arguments.GetFormattedArguments());
 
         return string.Join(' ', args);
     }
@@ -71,7 +74,7 @@ internal class OpaExecutable : IDisposable
     {
         if (!disposed)
         {
-            foreach (var file in files.Where(f => File.Exists(f)))
+            foreach (var file in createdFiles.Where(f => File.Exists(f)))
             {
                 File.Delete(file);
             }

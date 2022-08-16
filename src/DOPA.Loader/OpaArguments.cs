@@ -3,7 +3,7 @@ namespace DOPA.Loader;
 /// <summary>
 /// A collection of arguments to be used with the opa cli.
 /// </summary>
-public record OpaArguments
+public sealed record OpaArguments
 {
     /// <summary>
     /// Initializes the record.
@@ -12,11 +12,8 @@ public record OpaArguments
     /// <param name="entrypoints">The entrypoints to expose.</param>
     public OpaArguments(IEnumerable<string> filePaths, IEnumerable<string> entrypoints)
     {
-        ArgumentNullException.ThrowIfNull(filePaths);
-        ArgumentNullException.ThrowIfNull(entrypoints);
-
-        FilePaths = filePaths.ToList();
-        Entrypoints = entrypoints.ToList();
+        FilePaths = filePaths?.ToList() ?? throw new ArgumentNullException(nameof(filePaths));
+        Entrypoints = entrypoints?.ToList() ?? throw new ArgumentNullException(nameof(entrypoints));
 
         if (!FilePaths.Any())
         {
@@ -57,4 +54,20 @@ public record OpaArguments
     /// Path or version for capabilities.json.
     /// </summary>
     public string? Capabilities { get; init; }
+
+    private IEnumerable<string> EntrypointArgs => Entrypoints.Select(e => $"-e {e}");
+
+    private IEnumerable<string> CapabilitiesArg =>
+        new[] { Capabilities }
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Select(c => $"--capabilities {c}");
+
+    /// <summary>
+    /// Retrieves the collection of formatted args represented by this record.
+    /// </summary>
+    /// <returns>The formatted args.</returns>
+    public IEnumerable<string> GetFormattedArguments() =>
+        FilePaths
+            .Union(EntrypointArgs)
+            .Union(CapabilitiesArg);
 }

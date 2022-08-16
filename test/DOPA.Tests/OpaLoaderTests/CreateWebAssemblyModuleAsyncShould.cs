@@ -4,12 +4,12 @@ using FluentAssertions;
 
 namespace DOPA.Tests.OpaLoaderTests;
 
-public class CreateWebAssemblyStreamShould
+public class CreateWebAssemblyModuleAsyncShould
 {
     [Fact]
     public async Task ReturnSimpleModule()
     {
-        using var stream = await OpaLoader.CreateWebAssemblyStream("policies/example.rego", "example/hello");
+        using var stream = await OpaLoader.CreateWebAssemblyModuleAsync("policies/example.rego", "example/hello");
         using var module = WasmModule.FromStream("example", stream);
         using var policy = module.CreatePolicy();
         policy.SetData(new { world = "hello" });
@@ -21,20 +21,16 @@ public class CreateWebAssemblyStreamShould
     [Fact]
     public async Task ReturnModuleWithCapabilities()
     {
-        var args = new OpaArguments("policies/builtins.rego", "builtins")
+        var args = new OpaArguments("policies/builtins.rego", "builtins/firstValue")
         {
             Capabilities = "policies/builtins.capabilities.json"
         };
-        using var stream = await OpaLoader.CreateWebAssemblyStream(args);
+        using var stream = await OpaLoader.CreateWebAssemblyModuleAsync(args);
         using var module = WasmModule.FromStream("builtins", stream);
         using var policy = module.CreatePolicy();
         policy.AddBuiltin("custom.builtin0", () => 1);
-        policy.AddBuiltin("custom.builtin1", (int i) => 2);
-        policy.AddBuiltin("custom.builtin2", (int i, int j) => 3);
-        policy.AddBuiltin("custom.builtin3", (int i, int j, int k) => 4);
-        policy.AddBuiltin("custom.builtin4", (int i, int j, int k, int l) => 5);
 
-        var result = policy.EvaluateAt<string>("builtins/sdkBuiltinValue");
-        result.Should().Be("number");
+        var result = policy.Evaluate<int>();
+        result.Should().Be(1);
     }
 }

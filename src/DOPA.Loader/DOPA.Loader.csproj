@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net6.0;net5.0</TargetFrameworks>
+        <LangVersion>10</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
@@ -38,10 +39,14 @@
         </ItemGroup>
 
 
-        <DownloadFile Condition="!Exists('$(IntermediateOutputPath)/opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)')" SourceUrl="$(OpaReleaseUrl)%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)" DestinationFolder="$(IntermediateOutputPath)" SkipUnchangedFiles="true" />
+        <DownloadFile
+            Condition="!Exists('$(IntermediateOutputPath)/opa/$(OpaVersion)/opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)')"
+            SourceUrl="$(OpaReleaseUrl)%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)"
+            DestinationFolder="$(IntermediateOutputPath)/opa/$(OpaVersion)"
+            SkipUnchangedFiles="true" />
 
         <ItemGroup>
-            <Content Include="$(IntermediateOutputPath)/opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)">
+            <Content Include="$(IntermediateOutputPath)/opa/$(OpaVersion)/opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)">
                 <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
                 <Link>opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)</Link>
             </Content>
