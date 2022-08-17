@@ -11,7 +11,7 @@ internal class OpaExecutable : IDisposable
     private const string macFileName = "opa_darwin_amd64";
     private const string linuxFileName = "opa_linux_amd64";
 
-    private static readonly string filePath;
+    private static readonly string opaPath;
     private bool disposed;
     private List<string> createdFiles = new();
 
@@ -22,11 +22,11 @@ internal class OpaExecutable : IDisposable
                    OperatingSystem.IsLinux() ? linuxFileName :
                    throw new Exception("Unsupported OS detected.");
 
-        filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+        opaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
 
         if (!OperatingSystem.IsWindows())
         {
-            var p = Process.Start("chmod", $"755 {filePath}");
+            var p = Process.Start("chmod", $"755 {opaPath}");
             p.WaitForExit();
         }
     }
@@ -35,6 +35,14 @@ internal class OpaExecutable : IDisposable
     {
         var (p, bundleFilePath) = StartBuildProcess(arguments);
         await p.WaitForExitAsync();
+
+        if (p.ExitCode != 0)
+        {
+            var message = await p.StandardOutput.ReadToEndAsync();
+            throw new InvalidOperationException($"Could not build opa bundle:\n{opaPath}\n{message}");
+        }
+
+        p.Close();
         return bundleFilePath;
     }
 
@@ -42,6 +50,14 @@ internal class OpaExecutable : IDisposable
     {
         var (p, bundleFilePath) = StartBuildProcess(arguments);
         p.WaitForExit();
+
+        if (p.ExitCode != 0)
+        {
+            var message = p.StandardOutput.ReadToEnd();
+            throw new InvalidOperationException($"Could not build opa bundle:\n{opaPath}\n{message}");
+        }
+
+        p.Close();
         return bundleFilePath;
     }
 
@@ -49,7 +65,17 @@ internal class OpaExecutable : IDisposable
     {
         var bundleFilePath = GetNextBundlePath();
 
-        var p = Process.Start(filePath, MakeBuildArgs(bundleFilePath, arguments));
+        var p = new Process
+        {
+            StartInfo = new(opaPath)
+            {
+                Arguments = MakeBuildArgs(bundleFilePath, arguments),
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+            },
+        };
+
+        p.Start();
 
         createdFiles.Add(bundleFilePath);
 
