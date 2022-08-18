@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net5.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>10</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OpaVersion>0.43.0</OpaVersion>
+    <Version>$(OpaVersion).0</Version>
+  </PropertyGroup>
+
+  <Target Name="DownloadOpa" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <OpaReleaseUrl>https://openpolicyagent.org/downloads/v$(OpaVersion)/opa_</OpaReleaseUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <OpaBinary Include="linux">
+        <OS>linux</OS>
+        <Arch>amd64</Arch>
+        <FileExtension></FileExtension>
+      </OpaBinary>
+
+      <OpaBinary Include="darwin">
+        <OS>darwin</OS>
+        <Arch>amd64</Arch>
+        <FileExtension></FileExtension>
+      </OpaBinary>
+
+      <OpaBinary Include="windows">
+        <OS>windows</OS>
+        <Arch>amd64</Arch>
+        <FileExtension>.exe</FileExtension>
+      </OpaBinary>
+    </ItemGroup>
+
+    <DownloadFile
+      Condition="!Exists('$(IntermediateOutputPath)/opa/$(OpaVersion)/opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)')"
+      SourceUrl="$(OpaReleaseUrl)%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)"
+      DestinationFolder="$(IntermediateOutputPath)/opa/$(OpaVersion)"
+      SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <Content Include="$(IntermediateOutputPath)/opa/$(OpaVersion)/opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <Link>opa_%(OpaBinary.OS)_%(OpaBinary.Arch)%(OpaBinary.FileExtension)</Link>
+      </Content>
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="SharpZipLib" Version="1.3.3" />
+  </ItemGroup>
+</Project>

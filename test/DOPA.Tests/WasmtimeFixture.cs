@@ -1,5 +1,5 @@
 using DOPA.Extensions;
-using DOPA.Loader;
+using DOPA.Cli;
 
 namespace DOPA.Tests;
 
@@ -7,18 +7,16 @@ public class WasmtimeFixture : Disposable, IRuntimeFixture
 {
     private readonly Lazy<IOpaModule> exampleModule = new Lazy<IOpaModule>(() =>
     {
-        using var stream = OpaLoader.CreateWebAssemblyModule("policies/example.rego", "example/hello");
+        using var bundle = Opa.Build.WebAssembly().Files("policies/example.rego").Entrypoints("example/hello").Execute();
+        using var stream = bundle.ExtractWebAssemblyModule();
         return WasmModule.FromStream("example", stream);
     });
     public IOpaModule ExampleModule => exampleModule.Value;
 
     private readonly Lazy<IOpaModule> builtinsModule = new Lazy<IOpaModule>(() =>
     {
-        var args = new OpaArguments("policies/builtins.rego", "builtins")
-        {
-            Capabilities = "policies/builtins.capabilities.json"
-        };
-        using var stream = OpaLoader.CreateWebAssemblyModule(args);
+        using var bundle = Opa.Build.WebAssembly().Files("policies/builtins.rego").Entrypoints("builtins").Capabilities("policies/builtins.capabilities.json").Execute();
+        using var stream = bundle.ExtractWebAssemblyModule();
         return WasmModule.FromStream("builtins", stream);
     });
     public IOpaModule BuiltinsModule => builtinsModule.Value;

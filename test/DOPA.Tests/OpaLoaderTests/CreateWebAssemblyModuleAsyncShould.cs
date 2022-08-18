@@ -1,5 +1,5 @@
 using Xunit;
-using DOPA.Loader;
+using DOPA.Cli;
 using FluentAssertions;
 
 namespace DOPA.Tests.OpaLoaderTests;
@@ -9,7 +9,12 @@ public class CreateWebAssemblyModuleAsyncShould
     [Fact]
     public async Task ReturnSimpleModule()
     {
-        using var stream = await OpaLoader.CreateWebAssemblyModuleAsync("policies/example.rego", "example/hello");
+        using var bundle = await Opa.Build
+            .WebAssembly()
+            .Files("policies/example.rego")
+            .Entrypoints("example/hello")
+            .ExecuteAsync();
+        using var stream = bundle.ExtractWebAssemblyModule();
         using var module = WasmModule.FromStream("example", stream);
         using var policy = module.CreatePolicy();
         policy.SetData(new { world = "hello" });
@@ -21,11 +26,13 @@ public class CreateWebAssemblyModuleAsyncShould
     [Fact]
     public async Task ReturnModuleWithCapabilities()
     {
-        var args = new OpaArguments("policies/builtins.rego", "builtins/firstValue")
-        {
-            Capabilities = "policies/builtins.capabilities.json"
-        };
-        using var stream = await OpaLoader.CreateWebAssemblyModuleAsync(args);
+        using var bundle = await Opa.Build
+            .WebAssembly()
+            .Files("policies/builtins.rego")
+            .Entrypoints("builtins/firstValue")
+            .Capabilities("policies/builtins.capabilities.json")
+            .ExecuteAsync();
+        using var stream = bundle.ExtractWebAssemblyModule();
         using var module = WasmModule.FromStream("builtins", stream);
         using var policy = module.CreatePolicy();
         policy.AddBuiltin("custom.builtin0", () => 1);
