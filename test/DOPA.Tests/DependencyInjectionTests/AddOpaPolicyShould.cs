@@ -29,6 +29,7 @@ public class AddOpaPolicyShould
             .BuildServiceProvider();
         
         using var policy = provider.GetRequiredService<IOpaPolicy>();
+        InstanceShouldBeUsable(policy);
     }
 
     [Fact]
@@ -40,6 +41,7 @@ public class AddOpaPolicyShould
             .BuildServiceProvider();
         
         using var policy = provider.GetRequiredService<IOpaPolicy>();
+        InstanceShouldBeUsable(policy);
     }
 
     [Fact]
@@ -51,6 +53,7 @@ public class AddOpaPolicyShould
             .BuildServiceProvider();
         
         using var policy = provider.GetRequiredService<IOpaPolicy>();
+        InstanceShouldBeUsable(policy);
     }
 
     private void InstanceShouldBeUsable(IOpaPolicy policy)
