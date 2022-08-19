@@ -1,6 +1,6 @@
 <Project>
     <ItemGroup>
-        <Content Include="..\policies\*.wasm">
+        <Content Include="..\policies\*.*">
             <Link>policies\%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
