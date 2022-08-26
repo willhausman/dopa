@@ -32,7 +32,7 @@ jobs:
     - name: Test
       run: dotnet test -c ${{ matrix.config }} --no-build --verbosity normal
     - name: Publish on version change
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' && matrix.config == 'release' && matrix.os == 'ubuntu-latest'
       uses: alirezanet/publish-nuget@v3.0.4
       with:
         PROJECT_FILE_PATH: src/DOPA/DOPA.csproj
