@@ -12,7 +12,6 @@ public class CreatePolicyShould : OpaModuleTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
-    [InlineData(Runtime.Wasmer)]
     public void ReturnAPolicy(Runtime runtime)
     {
         var module = ExampleModule(runtime);
@@ -24,7 +23,6 @@ public class CreatePolicyShould : OpaModuleTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
-    [InlineData(Runtime.Wasmer)]
     public void ReturnAcrossThreads(Runtime runtime)
     {
         var module = ExampleModule(runtime);

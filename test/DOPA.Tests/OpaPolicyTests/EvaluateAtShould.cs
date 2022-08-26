@@ -12,7 +12,6 @@ public class EvaluateAtShould : OpaPolicyTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
-    [InlineData(Runtime.Wasmer)]
     public void ReturnValueForEntrypoint(Runtime runtime)
     {
         using var policy = BuiltinsPolicy(runtime);
