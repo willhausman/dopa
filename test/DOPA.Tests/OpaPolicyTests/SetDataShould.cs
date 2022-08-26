@@ -12,7 +12,6 @@ public class SetDataShould : OpaPolicyTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
-    [InlineData(Runtime.Wasmer)]
     public void OverwritePreviousData(Runtime runtime)
     {
         using var policy = ExamplePolicy(runtime);

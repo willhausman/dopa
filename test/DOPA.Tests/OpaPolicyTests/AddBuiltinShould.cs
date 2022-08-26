@@ -12,20 +12,17 @@ public class AddBuiltinShould : OpaPolicyTestBase
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
-    // [InlineData(Runtime.Wasmer)] interestingly, this test causes the test explorer to crash on Mac. Wasmer feeling worthless as a runtime.
     public void ThrowWhenBuiltinUndefined(Runtime runtime)
     {
         using var policy = BuiltinsPolicy(runtime);
 
         Action act = () => policy.Evaluate<object>();
 
-        // neither runtime does this in a very friendly way, but they do both throw as expected
-        act.Should().Throw<Exception>();
+        act.Should().Throw<Exception>().WithMessage("*Builtin not defined*");
     }
 
     [Theory]
     [InlineData(Runtime.Wasmtime)]
-    // [InlineData(Runtime.Wasmer)]
     public void CallAddedBuiltins(Runtime runtime)
     {
         using var policy = BuiltinsPolicy(runtime);
