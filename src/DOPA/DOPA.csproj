@@ -11,8 +11,8 @@
   <PropertyGroup>
     <AssemblyName>DOPA</AssemblyName>
     <PackageId>DOPA</PackageId>
-    <Version>1.0.2</Version>
-    <PackageReleaseNotes>Bump Wasmtime to version 0.39.1-preview2.</PackageReleaseNotes>
+    <Version>1.0.3</Version>
+    <PackageReleaseNotes>Bugfix: typed policies have unique module names.</PackageReleaseNotes>
     <Authors>Will Hausman</Authors>
     <Owners>Will Hausman</Owners>
     <IncludeSymbols>true</IncludeSymbols>
