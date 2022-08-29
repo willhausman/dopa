@@ -65,7 +65,7 @@ public static class OpaServiceCollectionExtensions
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, string wasmFilePath, Action<IOpaBuilder>? options = null)
     {
-        var name = nameof(TModuleName);
+        var name = typeof(TModuleName).Name;
         services
             .ConfigureModule(name, () => WasmModule.FromFile(name, wasmFilePath), options)
             .AddTransientOpaPolicy<TModuleName>(name);
@@ -81,7 +81,7 @@ public static class OpaServiceCollectionExtensions
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, byte[] wasmContent, Action<IOpaBuilder>? options = null)
     {
-        var name = nameof(TModuleName);
+        var name = typeof(TModuleName).Name;
         services
             .ConfigureModule(name, () => WasmModule.FromBytes(name, wasmContent), options)
             .AddTransientOpaPolicy<TModuleName>(name);
@@ -97,7 +97,7 @@ public static class OpaServiceCollectionExtensions
     /// <returns>The service collection.</returns>
     public static IServiceCollection AddOpaPolicy<TModuleName>(this IServiceCollection services, Stream stream, Action<IOpaBuilder>? options = null)
     {
-        var name = nameof(TModuleName);
+        var name = typeof(TModuleName).Name;
         services
             .ConfigureModule(name, () => WasmModule.FromStream(name, stream), options)
             .AddTransientOpaPolicy<TModuleName>(name);

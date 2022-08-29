@@ -47,7 +47,7 @@ public class AddOpaPolicyShould
     [Fact]
     public void ReturnAUsableInstanceFromStream()
     {
-        var stream = File.OpenRead("policies/example.wasm");
+        using var stream = File.OpenRead("policies/example.wasm");
         using var provider = new ServiceCollection()
             .AddOpaPolicy("policy", stream)
             .BuildServiceProvider();
@@ -55,6 +55,55 @@ public class AddOpaPolicyShould
         using var policy = provider.GetRequiredService<IOpaPolicy>();
         InstanceShouldBeUsable(policy);
     }
+
+    [Fact]
+    public void ReturnTypedInstancesFromStream()
+    {
+        using var stream1 = File.OpenRead("policies/example.wasm");
+        using var stream2 = File.OpenRead("policies/example.wasm");
+        using var provider = new ServiceCollection()
+            .AddOpaPolicy<Type1>(stream1)
+            .AddOpaPolicy<Type2>(stream2)
+            .BuildServiceProvider();
+        
+        using var policy1 = provider.GetRequiredService<IOpaPolicy<Type1>>();
+        using var policy2 = provider.GetRequiredService<IOpaPolicy<Type2>>();
+        InstanceShouldBeUsable(policy1);
+        InstanceShouldBeUsable(policy2);
+    }
+
+    [Fact]
+    public void ReturnTypedInstancesFromFile()
+    {
+        using var provider = new ServiceCollection()
+            .AddOpaPolicy<Type1>("policies/example.wasm")
+            .AddOpaPolicy<Type2>("policies/example.wasm")
+            .BuildServiceProvider();
+        
+        using var policy1 = provider.GetRequiredService<IOpaPolicy<Type1>>();
+        using var policy2 = provider.GetRequiredService<IOpaPolicy<Type2>>();
+        InstanceShouldBeUsable(policy1);
+        InstanceShouldBeUsable(policy2);
+    }
+
+    [Fact]
+    public void ReturnTypedInstancesFromBytes()
+    {
+        var contents1 = File.ReadAllBytes("policies/example.wasm");
+        var contents2 = File.ReadAllBytes("policies/example.wasm");
+        using var provider = new ServiceCollection()
+            .AddOpaPolicy<Type1>(contents1)
+            .AddOpaPolicy<Type2>(contents1)
+            .BuildServiceProvider();
+        
+        using var policy1 = provider.GetRequiredService<IOpaPolicy<Type1>>();
+        using var policy2 = provider.GetRequiredService<IOpaPolicy<Type2>>();
+        InstanceShouldBeUsable(policy1);
+        InstanceShouldBeUsable(policy2);
+    }
+
+    private record Type1();
+    private record Type2();
 
     private void InstanceShouldBeUsable(IOpaPolicy policy)
     {
