@@ -31,7 +31,7 @@ namespace DOPA.Runtime
                 Function.FromCallback(
                     store,
                     (Caller caller, int address) =>
-                        throw OpaAbortException.Because(memory.ReadNullTerminatedString(store, address))));
+                        throw OpaAbortException.Because(memory.ReadNullTerminatedString(address))));
             return linker;
         }
 

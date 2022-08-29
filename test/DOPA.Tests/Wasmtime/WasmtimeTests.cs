@@ -1,4 +1,3 @@
-using System;
 using FluentAssertions;
 using Wasmtime;
 using Xunit;
@@ -42,7 +41,7 @@ public class WasmtimeTests
 
         var instance = linker.Instantiate(store, module);
 
-        var result = instance.GetFunction(store, "run")?.Invoke(store);
+        var result = instance.GetFunction("run")?.Invoke();
         result.Should().Be(expected);
     }
 
@@ -67,8 +66,33 @@ public class WasmtimeTests
             instance = linker.Instantiate(store, module);
         }
 
-        var result = instance.GetFunction(store, "run")?.Invoke(store);
+        var result = instance.GetFunction("run")?.Invoke();
         result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void InstanceCannotRunWhenStoreIsDisposed()
+    {
+        using var engine = new Engine();
+        using var module = Module.FromText(engine, "hello", SampleWat);
+        Instance instance;
+
+        using (var store = new Store(engine))
+        {
+            using var linker = new Linker(engine);
+
+            linker.Define(
+                "",
+                "hello",
+                Function.FromCallback(store, () => 1)
+            );
+
+            instance = linker.Instantiate(store, module);
+        }
+
+        var act = () => instance.GetFunction("run")?.Invoke();
+
+        act.Should().Throw<ObjectDisposedException>();
     }
 
     private const string SampleWat = @"(module

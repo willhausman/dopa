@@ -24,18 +24,18 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
     }
 
     public string ReadValueAt(int address) =>
-        memory.ReadNullTerminatedString(store, address);
+        memory.ReadNullTerminatedString(address);
 
     public int WriteValue(string json)
     {
         var address = Invoke<int>(WellKnown.Export.opa_malloc, json.Length);
-        memory.WriteString(store, address, json);
+        memory.WriteString(address, json);
         return address;
     }
 
     public void Invoke(string function, params int[] rest)
     {
-        var run = instance.GetFunction(store, function);
+        var run = instance.GetFunction(function);
 
         var @params = rest
             .ToList()
@@ -44,7 +44,7 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
 
         if (run is not null)
         {
-            run.Invoke(store, @params);
+            run.Invoke(@params);
         }
         else
         {
@@ -54,7 +54,7 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
 
     public T? Invoke<T>(string function, params int[] rest)
     {
-        var run = instance.GetFunction(store, function);
+        var run = instance.GetFunction(function);
 
         var @params = rest
             .ToList()
@@ -63,7 +63,7 @@ internal sealed class OpaRuntime : Disposable, IOpaRuntime
 
         if (run is not null)
         {
-            return (T?)run.Invoke(store, @params);
+            return (T?)run.Invoke(@params);
         }
 
         throw new InvalidOperationException($"Could not invoke '{function}'");
