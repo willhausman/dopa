@@ -11,8 +11,8 @@
   <PropertyGroup>
     <AssemblyName>DOPA</AssemblyName>
     <PackageId>DOPA</PackageId>
-    <Version>1.0.3</Version>
-    <PackageReleaseNotes>Bugfix: typed policies have unique module names.</PackageReleaseNotes>
+    <Version>1.0.4</Version>
+    <PackageReleaseNotes>Bump Wasmtime to 0.40.0-preview1.</PackageReleaseNotes>
     <Authors>Will Hausman</Authors>
     <Owners>Will Hausman</Owners>
     <IncludeSymbols>true</IncludeSymbols>
@@ -33,8 +33,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Wasmtime" Version="0.39.1-preview2" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+    <PackageReference Include="Wasmtime" Version="0.40.0-preview1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
