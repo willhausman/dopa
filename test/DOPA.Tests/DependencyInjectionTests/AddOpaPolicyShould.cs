@@ -7,11 +7,12 @@ namespace DOPA.Tests.DependencyInjectionTests;
 
 public class AddOpaPolicyShould
 {
+    private readonly string examplePath = "policies/example.wasm";
     [Fact]
     public void DisposeTheModule()
     {
         var provider = new ServiceCollection()
-            .AddOpaPolicy("policies/example.wasm")
+            .AddOpaPolicy(examplePath)
             .BuildServiceProvider();
 
         var module = provider.GetRequiredService<IOpaModule>();
@@ -25,7 +26,7 @@ public class AddOpaPolicyShould
     public void ReturnAUsableInstanceFromAFile()
     {
         using var provider = new ServiceCollection()
-            .AddOpaPolicy("policies/example.wasm")
+            .AddOpaPolicy(examplePath)
             .BuildServiceProvider();
         
         using var policy = provider.GetRequiredService<IOpaPolicy>();
@@ -35,7 +36,7 @@ public class AddOpaPolicyShould
     [Fact]
     public void ReturnAUsableInstanceFromBytes()
     {
-        var contents = File.ReadAllBytes("policies/example.wasm");
+        var contents = File.ReadAllBytes(examplePath);
         using var provider = new ServiceCollection()
             .AddOpaPolicy("policy", contents)
             .BuildServiceProvider();
@@ -47,7 +48,7 @@ public class AddOpaPolicyShould
     [Fact]
     public void ReturnAUsableInstanceFromStream()
     {
-        using var stream = File.OpenRead("policies/example.wasm");
+        using var stream = File.OpenRead(examplePath);
         using var provider = new ServiceCollection()
             .AddOpaPolicy("policy", stream)
             .BuildServiceProvider();
@@ -59,8 +60,8 @@ public class AddOpaPolicyShould
     [Fact]
     public void ReturnTypedInstancesFromStream()
     {
-        using var stream1 = File.OpenRead("policies/example.wasm");
-        using var stream2 = File.OpenRead("policies/example.wasm");
+        using var stream1 = File.OpenRead(examplePath);
+        using var stream2 = File.OpenRead(examplePath);
         using var provider = new ServiceCollection()
             .AddOpaPolicy<Type1>(stream1)
             .AddOpaPolicy<Type2>(stream2)
@@ -76,8 +77,8 @@ public class AddOpaPolicyShould
     public void ReturnTypedInstancesFromFile()
     {
         using var provider = new ServiceCollection()
-            .AddOpaPolicy<Type1>("policies/example.wasm")
-            .AddOpaPolicy<Type2>("policies/example.wasm")
+            .AddOpaPolicy<Type1>(examplePath)
+            .AddOpaPolicy<Type2>(examplePath)
             .BuildServiceProvider();
         
         using var policy1 = provider.GetRequiredService<IOpaPolicy<Type1>>();
@@ -89,8 +90,8 @@ public class AddOpaPolicyShould
     [Fact]
     public void ReturnTypedInstancesFromBytes()
     {
-        var contents1 = File.ReadAllBytes("policies/example.wasm");
-        var contents2 = File.ReadAllBytes("policies/example.wasm");
+        var contents1 = File.ReadAllBytes(examplePath);
+        var contents2 = File.ReadAllBytes(examplePath);
         using var provider = new ServiceCollection()
             .AddOpaPolicy<Type1>(contents1)
             .AddOpaPolicy<Type2>(contents1)
