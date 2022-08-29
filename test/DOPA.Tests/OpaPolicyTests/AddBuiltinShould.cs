@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using DOPA.Cli;
+using FluentAssertions;
 using Xunit;
 
 namespace DOPA.Tests.OpaPolicyTests;
@@ -40,6 +41,36 @@ public class AddBuiltinShould : OpaPolicyTestBase
         result.FourthValue.Should().BeTrue();
         result.FifthValue.Should().BeEquivalentTo(new Builtin4Result(1, "2", new [] { "1", "2" }, true));
         result.SdkBuiltinValue.Should().Be("object");
+    }
+
+    [Fact]
+    public void CallNestedPolicies()
+    {
+        using var bundle1 = Opa.Build
+            .WebAssembly()
+            .Files("policies/builtins.rego")
+            .Entrypoints("builtins/secondValue")
+            .Capabilities("policies/builtins.capabilities.json")
+            .Execute();
+        using var stream1 = bundle1.ExtractWebAssemblyModule();
+        using var module1 = WasmModule.FromStream("stream1", stream1);
+        using var policy1 = module1.CreatePolicy();
+        policy1.AddBuiltin("custom.builtin0", () => 1);
+        policy1.AddBuiltin("custom.builtin1", (int i) => i + 1);
+
+        using var bundle2 = Opa.Build
+            .WebAssembly()
+            .Files("policies/builtins.rego")
+            .Entrypoints("builtins/firstValue")
+            .Capabilities("policies/builtins.capabilities.json")
+            .Execute();
+        using var stream2 = bundle2.ExtractWebAssemblyModule();
+        using var module2 = WasmModule.FromStream("stream2", stream2);
+        using var policy2 = module2.CreatePolicy();
+        policy2.AddBuiltin("custom.builtin0", () => policy1.Evaluate<int>() + 1);
+
+        var result = policy2.Evaluate<int>();
+        result.Should().Be(3);
     }
 
     private record BuiltinsResult(int FirstValue, string SecondValue, string[] ThirdValue, bool FourthValue, Builtin4Result FifthValue, string SdkBuiltinValue);
