@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
@@ -11,8 +11,8 @@
   <PropertyGroup>
     <AssemblyName>DOPA</AssemblyName>
     <PackageId>DOPA</PackageId>
-    <Version>1.0.5</Version>
-    <PackageReleaseNotes>Bump Wasmtime to 1.0.0.</PackageReleaseNotes>
+    <Version>1.1.0</Version>
+    <PackageReleaseNotes>Target dotnet 7, and Wasmtime 2.0.2.</PackageReleaseNotes>
     <Authors>Will Hausman</Authors>
     <Owners>Will Hausman</Owners>
     <IncludeSymbols>true</IncludeSymbols>

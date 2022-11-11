@@ -6,14 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/src/DOPA" # Location of package manifests
-    schedule:
-      interval: "daily"
-      time: "00:00"
-    reviewers:
-      - "willhausman"
-  - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/test/DOPA.Tests" # Location of package manifests
+    directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
       time: "00:00"
