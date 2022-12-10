@@ -25,23 +25,21 @@ namespace DOPA.Runtime
         {
             linker.Define(WellKnown.Imports.Namespace, WellKnown.Imports.memory, memory);
 
-            linker.Define(
+            linker.DefineFunction(
                 WellKnown.Imports.Namespace,
                 WellKnown.Imports.opa_abort,
-                Function.FromCallback(
-                    store,
-                    (Caller caller, int address) =>
-                        throw OpaAbortException.Because(memory.ReadNullTerminatedString(address))));
+                (Caller caller, int address) =>
+                    throw OpaAbortException.Because(memory.ReadNullTerminatedString(address)));
             return linker;
         }
 
         private static Linker DefineBuiltins(this Linker linker, Store store, IBuiltinCollection builtins)
         {
-            linker.Define(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin0, Function.FromCallback(store, (Caller caller, int builtinId, int _) => builtins[builtinId].Invoke()));
-            linker.Define(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin1, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1) => builtins[builtinId].Invoke(address1)));
-            linker.Define(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin2, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2) => builtins[builtinId].Invoke(address1, address2)));
-            linker.Define(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin3, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3) => builtins[builtinId].Invoke(address1, address2, address3)));
-            linker.Define(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin4, Function.FromCallback(store, (Caller caller, int builtinId, int _, int address1, int address2, int address3, int address4) => builtins[builtinId].Invoke(address1, address2, address3, address4)));
+            linker.DefineFunction(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin0, (Caller caller, int builtinId, int _) => builtins[builtinId].Invoke());
+            linker.DefineFunction(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin1, (Caller caller, int builtinId, int _, int address1) => builtins[builtinId].Invoke(address1));
+            linker.DefineFunction(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin2, (Caller caller, int builtinId, int _, int address1, int address2) => builtins[builtinId].Invoke(address1, address2));
+            linker.DefineFunction(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin3, (Caller caller, int builtinId, int _, int address1, int address2, int address3) => builtins[builtinId].Invoke(address1, address2, address3));
+            linker.DefineFunction(WellKnown.Imports.Namespace, WellKnown.Imports.opa_builtin4, (Caller caller, int builtinId, int _, int address1, int address2, int address3, int address4) => builtins[builtinId].Invoke(address1, address2, address3, address4));
 
             return linker;
         }

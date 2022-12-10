@@ -1,5 +1,6 @@
 ﻿using DOPA.Cli;
 using FluentAssertions;
+using Wasmtime;
 using Xunit;
 
 namespace DOPA.Tests.OpaPolicyTests;
@@ -11,15 +12,35 @@ public class AddBuiltinShould : OpaPolicyTestBase
     {
     }
 
-    [Theory]
-    [InlineData(Runtime.Wasmtime)]
-    public void ThrowWhenBuiltinUndefined(Runtime runtime)
+    [Fact]
+    public void ThrowWhenBuiltinUndefined()
     {
-        using var policy = BuiltinsPolicy(runtime);
+        using var policy = BuiltinsPolicy(Runtime.Wasmtime);
 
         Action act = () => policy.Evaluate<object>();
 
-        act.Should().Throw<Exception>().WithMessage("*Builtin not defined*");
+        act.Should()
+            .Throw<WasmtimeException>()
+            .WithInnerException<InvalidOperationException>()
+            .WithMessage("*Builtin not defined*");
+    }
+
+    [Fact]
+    public void IncludeOriginalExceptionWhenThrown()
+    {
+        var message = "Weirdly non-specific message";
+        var bizarreExcetpion = new NotFiniteNumberException(message);
+        Func<int> throwBizarreFunction = () => throw bizarreExcetpion;
+
+        using var policy = BuiltinsPolicy(Runtime.Wasmtime);
+        policy.AddBuiltin("custom.builtin0", throwBizarreFunction);
+
+        Action act = () => policy.Evaluate<object>();
+
+        act.Should()
+            .Throw<WasmtimeException>()
+            .WithInnerException<NotFiniteNumberException>()
+            .WithMessage(message);
     }
 
     [Theory]
