@@ -27,6 +27,7 @@ jobs:
         dotnet-version: |
           6.0.x
           7.0.x
+          8.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
@@ -47,6 +48,7 @@ jobs:
         dotnet-version: |
           6.0.x
           7.0.x
+          8.0.x
     - name: Publish on version change
       uses: alirezanet/publish-nuget@v3.0.4
       with:
